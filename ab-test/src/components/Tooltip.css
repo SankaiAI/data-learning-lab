@@ -1,0 +1,112 @@
+.tooltip-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 6px;
+}
+
+.tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    cursor: help;
+    transition: all 0.2s ease;
+}
+
+.tooltip-icon:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+}
+
+.tooltip-content {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    min-width: 280px;
+    max-width: 400px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: left;
+    pointer-events: none;
+}
+
+.tooltip-content::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(102, 126, 234, 0.3);
+}
+
+.steps-tooltip {
+    min-width: 320px;
+}
+
+.tooltip-title {
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-steps {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.tooltip-steps li {
+    margin-bottom: 6px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.tooltip-steps li:last-child {
+    margin-bottom: 0;
+}
+
+.tooltip-steps li::marker {
+    color: #38ef7d;
+}
+
+/* Positioning adjustment for edges */
+.tooltip-wrapper:first-child .tooltip-content {
+    left: 0;
+    transform: translateX(0);
+}
+
+.tooltip-wrapper:first-child .tooltip-content::after {
+    left: 16px;
+    transform: translateX(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .tooltip-content {
+        min-width: 220px;
+        max-width: 280px;
+        font-size: 0.8rem;
+    }
+
+    .steps-tooltip {
+        min-width: 260px;
+    }
+}
