@@ -2,7 +2,7 @@
 
 An interactive web application that teaches A/B testing concepts through real-time simulated streaming events. Learn how **CUPED** reduces variance and **Difference-in-Differences (DiD)** removes confounding time effects—all with visual, step-by-step explanations.
 
-![Screenshot](docs/screenshot.png)
+![Screenshot](public/panel.png)
 
 ## Quick Start
 
