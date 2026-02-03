@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import type { MetricType } from '../simulation/types';
+import { METRIC_CONFIGS } from '../simulation/types';
 import { useLanguage } from '../i18n';
 import { HelpTooltip } from './Tooltip';
 import './SampleSizePanel.css';
@@ -50,36 +52,67 @@ function normalInverseCDF(p: number): number {
 }
 
 function calculateSampleSize(
-    baselineCTR: number,
+    baseline: number,
     mde: number,
     power: number,
-    alpha: number
+    alpha: number,
+    metricType: MetricType
 ): number {
     const zAlpha = normalInverseCDF(1 - alpha / 2);
     const zBeta = normalInverseCDF(power);
 
-    const p = baselineCTR;
-    const variance = p * (1 - p);
+    let variance;
+    if (metricType === 'ctr' || metricType === 'conversion') {
+        // for proportion metrics, variance = p(1-p)
+        const p = baseline;
+        // clamp p to avoid negative variance
+        const safeP = Math.max(0.001, Math.min(0.999, p));
+        variance = safeP * (1 - safeP);
+    } else {
+        // for continuous metrics like revenue/duration
+        // we assume a CV (Coefficient of Variation) or Standard Deviation
+        // for simplicity, let's assume variance scales with the mean squared (CV=1 assumption if not provided)
+        // or just use a fixed variance assumption for the demo.
+        // Actually, let's use a CV assumption of 1.0 (sigma = mean) which is common for exponential-like data (revenue, duration)
+        const sigma = baseline; // assume standard deviation ~= mean (CV=1)
+        variance = sigma * sigma;
+    }
 
     const n = 2 * Math.pow(zAlpha + zBeta, 2) * variance / Math.pow(mde, 2);
 
     return Math.ceil(n);
 }
 
-export function SampleSizePanel() {
+interface SampleSizePanelProps {
+    metricType: MetricType;
+    baselineValue: number;
+}
+
+export function SampleSizePanel({ metricType, baselineValue }: SampleSizePanelProps) {
     const { t, language } = useLanguage();
     const helpTitle = language === 'zh' ? t('helpTitleZh') : t('helpTitle');
+    const config = METRIC_CONFIGS[metricType];
+
+    // Determine default values based on metric type & prop baseline
+    // This effect runs when metricType or baselineValue changes
+    useEffect(() => {
+        // Update baseline and MDE defaults when metric type/baseline changes
+        setBaselineCTR(baselineValue);
+        // Scale MDE: for % metrics, use small value (0.01), for continuous, use relative % of baseline
+        const defaultRelativeMde = 0.05; // 5% lift 
+        setMde(baselineValue * defaultRelativeMde);
+    }, [metricType, baselineValue]);
 
     // Input states
-    const [baselineCTR, setBaselineCTR] = useState(0.05); // 5%
-    const [mde, setMde] = useState(0.01); // 1% absolute lift
+    const [baselineCTR, setBaselineCTR] = useState(baselineValue);
+    const [mde, setMde] = useState(baselineValue * 0.05); // Default MDE
     const [power, setPower] = useState(0.8); // 80%
     const [alpha, setAlpha] = useState(0.05); // 5%
     const [dailyTraffic, setDailyTraffic] = useState(10000);
     const [trafficAllocation, setTrafficAllocation] = useState(1.0); // 100%
 
     // Calculate sample size
-    const sampleSizePerGroup = calculateSampleSize(baselineCTR, mde, power, alpha);
+    const sampleSizePerGroup = calculateSampleSize(baselineCTR, mde, power, alpha, metricType);
     const totalSampleSize = sampleSizePerGroup * 2;
 
     // Calculate duration
@@ -87,8 +120,39 @@ export function SampleSizePanel() {
     const durationDays = Math.ceil(totalSampleSize / effectiveDailyTraffic);
     const durationWeeks = (durationDays / 7).toFixed(1);
 
+    // Get metric label
+    const getMetricLabel = () => {
+        switch (metricType) {
+            case 'ctr': return 'CTR';
+            case 'conversion': return language === 'zh' ? '转化率' : 'Conversion';
+            case 'revenue': return language === 'zh' ? '收入' : 'Revenue';
+            case 'duration': return language === 'zh' ? '时长' : 'Duration';
+            default: return 'Metric';
+        }
+    };
+    const metricLabel = getMetricLabel();
+
+    const formatValue = (n: number) => {
+        if (config.unit === 'percent') {
+            return (n * 100).toFixed(1) + '%';
+        } else if (config.unit === 'currency') {
+            const symbol = language === 'zh' ? '¥' : '$';
+            return symbol + n.toFixed(2);
+        } else {
+            const unit = language === 'zh' ? '秒' : 's';
+            return n.toFixed(1) + unit;
+        }
+    };
+
     const formatPercent = (n: number) => (n * 100).toFixed(1) + '%';
     const formatNumber = (n: number) => n.toLocaleString();
+
+    // Adjust step and max for inputs based on metric
+    const baselineMax = config.unit === 'percent' ? 0.3 : config.maxValue;
+    const baselineStep = config.unit === 'percent' ? 0.005 : (config.maxValue - config.minValue) / 100;
+
+    const mdeMax = config.unit === 'percent' ? 0.05 : (config.baselineValue * 0.2); // max 20% lift
+    const mdeStep = config.unit === 'percent' ? 0.001 : (config.baselineValue * 0.005);
 
     return (
         <div className="sample-size-panel analysis-panel">
@@ -108,32 +172,35 @@ export function SampleSizePanel() {
 
                     <div className="input-group">
                         <label>
-                            {t('baselineCTRLabel')}
+                            {language === 'zh' ? `基线 ${metricLabel}` : `Baseline ${metricLabel}`}
                             <HelpTooltip steps={t('helpBaselineCTR') as unknown as string[]} title={helpTitle} />
-                            <strong>{formatPercent(baselineCTR)}</strong>
+                            <strong>{formatValue(baselineCTR)}</strong>
                         </label>
                         <input
                             type="range"
-                            min="0.01"
-                            max="0.3"
-                            step="0.005"
+                            min={config.minValue}
+                            max={baselineMax}
+                            step={baselineStep}
                             value={baselineCTR}
                             onChange={(e) => setBaselineCTR(parseFloat(e.target.value))}
                         />
-                        <p className="input-desc">{t('baselineCTRDesc')}</p>
+                        <p className="input-desc">
+                            {metricType === 'ctr' ? t('baselineCTRDesc') :
+                                (language === 'zh' ? `实验前的当前${metricLabel}` : `Your current ${metricLabel} before the experiment.`)}
+                        </p>
                     </div>
 
                     <div className="input-group">
                         <label>
                             {t('mdeLabel')}
                             <HelpTooltip steps={t('helpMDE') as unknown as string[]} title={helpTitle} />
-                            <strong>{formatPercent(mde)}</strong>
+                            <strong>{formatValue(mde)}</strong>
                         </label>
                         <input
                             type="range"
-                            min="0.001"
-                            max="0.05"
-                            step="0.001"
+                            min={mdeStep}
+                            max={mdeMax}
+                            step={mdeStep}
                             value={mde}
                             onChange={(e) => setMde(parseFloat(e.target.value))}
                         />

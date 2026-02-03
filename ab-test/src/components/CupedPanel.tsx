@@ -1,5 +1,6 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import type { CupedResult } from '../simulation/types';
+import type { CupedResult, MetricType } from '../simulation/types';
+import { METRIC_CONFIGS } from '../simulation/types';
 import { useLanguage } from '../i18n';
 import { HelpTooltip } from './Tooltip';
 import './CupedPanel.css';
@@ -10,19 +11,52 @@ interface CupedPanelProps {
         control: Array<{ x: number; y: number }>;
         treatment: Array<{ x: number; y: number }>;
     };
+    metricType: MetricType;
 }
 
-export function CupedPanel({ result, scatterData }: CupedPanelProps) {
+export function CupedPanel({ result, scatterData, metricType }: CupedPanelProps) {
     const { t, language } = useLanguage();
-    const formatPercent = (n: number, decimals = 2) => (n * 100).toFixed(decimals) + '%';
+    const config = METRIC_CONFIGS[metricType];
+
+    // Get metric label for display
+    const getMetricLabel = () => {
+        switch (metricType) {
+            case 'ctr': return 'CTR';
+            case 'conversion': return language === 'zh' ? '转化率' : 'Conversion';
+            case 'revenue': return language === 'zh' ? '收入' : 'Revenue';
+            case 'duration': return language === 'zh' ? '时长' : 'Duration';
+            default: return 'Metric';
+        }
+    };
+    const metricLabel = getMetricLabel();
+
+    // Format value based on metric type
+    const formatValue = (n: number, decimals = 2) => {
+        if (config.unit === 'percent') {
+            return (n * 100).toFixed(decimals) + '%';
+        } else if (config.unit === 'currency') {
+            const symbol = language === 'zh' ? '¥' : '$';
+            return symbol + n.toFixed(decimals);
+        } else {
+            const unit = language === 'zh' ? '秒' : 's';
+            return n.toFixed(decimals) + unit;
+        }
+    };
+
     const formatPValue = (p: number) => {
         if (p < 0.001) return '< 0.001';
         return p.toFixed(4);
     };
 
-    const controlData = scatterData.control.map(p => ({ x: p.x * 100, y: p.y * 100 }));
-    const treatmentData = scatterData.treatment.map(p => ({ x: p.x * 100, y: p.y * 100 }));
+    // Scale data for display based on metric type
+    const controlData = config.unit === 'percent'
+        ? scatterData.control.map(p => ({ x: p.x * 100, y: p.y * 100 }))
+        : scatterData.control;
+    const treatmentData = config.unit === 'percent'
+        ? scatterData.treatment.map(p => ({ x: p.x * 100, y: p.y * 100 }))
+        : scatterData.treatment;
     const helpTitle = language === 'zh' ? t('helpTitleZh') : t('helpTitle');
+    const chartUnit = config.unit === 'percent' ? '%' : (config.unit === 'currency' ? '$' : 's');
 
     return (
         <div className="cuped-panel analysis-panel">
@@ -37,7 +71,7 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
                 <div className="formula">
                     Y<sub>adj</sub> = Y - θ × (X - X̄)
                 </div>
-                <p>Where X is pre-period CTR, Y is post-period CTR, and θ = Cov(Y,X) / Var(X)</p>
+                <p>Where X is pre-period {metricLabel}, Y is post-period {metricLabel}, and θ = Cov(Y,X) / Var(X)</p>
             </div>
 
             <div className="steps-section">
@@ -80,7 +114,7 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
             </div>
 
             <div className="scatter-section">
-                <h3>{t('preVsPostCTR')}</h3>
+                <h3>{language === 'zh' ? `前后期 ${metricLabel} 对比` : `Pre vs Post ${metricLabel}`}</h3>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={320}>
                         <ScatterChart margin={{ top: 30, right: 20, bottom: 50, left: 60 }}>
@@ -88,18 +122,18 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
                             <XAxis
                                 type="number"
                                 dataKey="x"
-                                name="Pre-period CTR"
-                                unit="%"
+                                name={`Pre-period ${metricLabel}`}
+                                unit={chartUnit}
                                 stroke="rgba(255,255,255,0.5)"
-                                label={{ value: 'Pre-period CTR (%)', position: 'insideBottom', offset: -10, fill: 'rgba(255,255,255,0.6)' }}
+                                label={{ value: `Pre-period ${metricLabel} (${chartUnit})`, position: 'insideBottom', offset: -10, fill: 'rgba(255,255,255,0.6)' }}
                             />
                             <YAxis
                                 type="number"
                                 dataKey="y"
-                                name="Post-period CTR"
-                                unit="%"
+                                name={`Post-period ${metricLabel}`}
+                                unit={chartUnit}
                                 stroke="rgba(255,255,255,0.5)"
-                                label={{ value: 'Post-period CTR (%)', angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
+                                label={{ value: `Post-period ${metricLabel} (${chartUnit})`, angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
                             />
                             <Tooltip
                                 contentStyle={{
@@ -137,7 +171,7 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
                     </div>
                     <div className="variance-reduction">
                         <span className="reduction-value">
-                            {formatPercent(result.varianceReduction)} {t('reduction')}
+                            {(result.varianceReduction * 100).toFixed(1)}% {t('reduction')}
                         </span>
                         <span className="reduction-explain">{t('inVariance')}</span>
                     </div>
@@ -149,7 +183,7 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
                 <div className="effect-display">
                     <span className="effect-label">{t('cupedAdjustedEffect')}</span>
                     <span className={`effect-value ${result.estimate > 0 ? 'positive' : 'negative'}`}>
-                        {result.estimate > 0 ? '+' : ''}{formatPercent(result.estimate)}
+                        {result.estimate > 0 ? '+' : ''}{formatValue(result.estimate)}
                     </span>
                 </div>
 
@@ -166,7 +200,7 @@ export function CupedPanel({ result, scatterData }: CupedPanelProps) {
                             {t('stdError')}
                             <HelpTooltip steps={t('helpStandardError') as unknown as string[]} title={helpTitle} />
                         </span>
-                        <span className="stat-value">{formatPercent(result.standardError, 3)}</span>
+                        <span className="stat-value">{formatValue(result.standardError, 3)}</span>
                     </div>
                     <div className="stat-item">
                         <span className="stat-label">

@@ -54,6 +54,7 @@ function AppContent() {
           <LiveStream
             events={simulation.events}
             metrics={simulation.metrics}
+            metricType={simulation.config.metricType}
           />
         </aside>
 
@@ -73,19 +74,24 @@ function AppContent() {
 
           <div className="tab-content">
             {activeTab === 'samplesize' && (
-              <SampleSizePanel />
+              <SampleSizePanel
+                metricType={simulation.config.metricType}
+                baselineValue={simulation.config.baselineValue}
+              />
             )}
             {activeTab === 'raw' && (
               <RawABPanel
                 result={simulation.naiveResult}
                 metrics={simulation.metrics}
                 imbalanceCheck={simulation.imbalanceCheck}
+                metricType={simulation.config.metricType}
               />
             )}
             {activeTab === 'cuped' && (
               <CupedPanel
                 result={simulation.cupedResult}
                 scatterData={simulation.cupedScatter}
+                metricType={simulation.config.metricType}
               />
             )}
             {activeTab === 'did' && (
@@ -95,6 +101,7 @@ function AppContent() {
                 launchTime={simulation.config.launchTime}
                 parallelCheck={simulation.parallelCheck}
                 regression={simulation.didRegression}
+                metricType={simulation.config.metricType}
               />
             )}
             {activeTab === 'compare' && (
@@ -104,6 +111,7 @@ function AppContent() {
                 didResult={simulation.didResult}
                 metrics={simulation.metrics}
                 trueEffect={simulation.config.treatmentEffect}
+                metricType={simulation.config.metricType}
               />
             )}
           </div>

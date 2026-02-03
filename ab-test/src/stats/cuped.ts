@@ -1,4 +1,5 @@
-import type { User, CupedResult } from '../simulation/types';
+import type { User, CupedResult, MetricType } from '../simulation/types';
+import { METRIC_CONFIGS } from '../simulation/types';
 import { mean, variance, covariance, confidenceInterval, zScore, pValueFromZ } from './utils';
 
 export interface UserMetrics {
@@ -8,19 +9,34 @@ export interface UserMetrics {
     postMetric: number;
 }
 
-export function extractUserMetrics(users: User[]): UserMetrics[] {
-    return users
-        .filter(u => u.preImpressions > 0 && u.postImpressions > 0)
-        .map(u => ({
-            userId: u.id,
-            group: u.group,
-            preMetric: u.preClicks / u.preImpressions,
-            postMetric: u.postClicks / u.postImpressions,
-        }));
+export function extractUserMetrics(users: User[], metricType: MetricType = 'ctr'): UserMetrics[] {
+    const config = METRIC_CONFIGS[metricType];
+
+    if (config.isContinuous) {
+        // For continuous metrics, use metric sums/counts
+        return users
+            .filter(u => u.preMetricCount > 0 && u.postMetricCount > 0)
+            .map(u => ({
+                userId: u.id,
+                group: u.group,
+                preMetric: u.preMetricSum / u.preMetricCount,
+                postMetric: u.postMetricSum / u.postMetricCount,
+            }));
+    } else {
+        // For proportions, use clicks/impressions
+        return users
+            .filter(u => u.preImpressions > 0 && u.postImpressions > 0)
+            .map(u => ({
+                userId: u.id,
+                group: u.group,
+                preMetric: u.preClicks / u.preImpressions,
+                postMetric: u.postClicks / u.postImpressions,
+            }));
+    }
 }
 
-export function computeCUPED(users: User[]): CupedResult {
-    const userMetrics = extractUserMetrics(users);
+export function computeCUPED(users: User[], metricType: MetricType = 'ctr'): CupedResult {
+    const userMetrics = extractUserMetrics(users, metricType);
 
     if (userMetrics.length < 10) {
         return {
@@ -88,11 +104,11 @@ export function computeCUPED(users: User[]): CupedResult {
     };
 }
 
-export function getCupedScatterData(users: User[]): {
+export function getCupedScatterData(users: User[], metricType: MetricType = 'ctr'): {
     control: Array<{ x: number; y: number }>;
     treatment: Array<{ x: number; y: number }>;
 } {
-    const userMetrics = extractUserMetrics(users);
+    const userMetrics = extractUserMetrics(users, metricType);
 
     return {
         control: userMetrics

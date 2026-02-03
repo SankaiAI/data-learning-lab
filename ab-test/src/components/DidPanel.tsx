@@ -1,5 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
-import type { DidResult, TimeSeriesPoint } from '../simulation/types';
+import type { DidResult, TimeSeriesPoint, MetricType } from '../simulation/types';
+import { METRIC_CONFIGS } from '../simulation/types';
 import { useLanguage } from '../i18n';
 import { HelpTooltip } from './Tooltip';
 import './DidPanel.css';
@@ -19,11 +20,39 @@ interface DidPanelProps {
         postCoef: number;
         interactionCoef: number;
     };
+    metricType: MetricType;
 }
 
-export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regression }: DidPanelProps) {
+export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regression, metricType }: DidPanelProps) {
     const { t, language } = useLanguage();
-    const formatPercent = (n: number, decimals = 2) => (n * 100).toFixed(decimals) + '%';
+    const config = METRIC_CONFIGS[metricType];
+
+    // Get metric label for display
+    const getMetricLabel = () => {
+        switch (metricType) {
+            case 'ctr': return 'CTR';
+            case 'conversion': return language === 'zh' ? '转化率' : 'Conversion';
+            case 'revenue': return language === 'zh' ? '收入' : 'Revenue';
+            case 'duration': return language === 'zh' ? '时长' : 'Duration';
+            default: return 'Metric';
+        }
+    };
+    const metricLabel = getMetricLabel();
+    const chartUnit = config.unit === 'percent' ? '%' : (config.unit === 'currency' ? '$' : 's');
+
+    // Format value based on metric type
+    const formatValue = (n: number, decimals = 2) => {
+        if (config.unit === 'percent') {
+            return (n * 100).toFixed(decimals) + '%';
+        } else if (config.unit === 'currency') {
+            const symbol = language === 'zh' ? '¥' : '$';
+            return symbol + n.toFixed(decimals);
+        } else {
+            const unit = language === 'zh' ? '秒' : 's';
+            return n.toFixed(decimals) + unit;
+        }
+    };
+
     const formatPValue = (p: number) => {
         if (p < 0.001) return '< 0.001';
         return p.toFixed(4);
@@ -31,8 +60,8 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
 
     const chartData = timeSeries.map(p => ({
         time: p.time,
-        Control: p.controlCTR * 100,
-        Treatment: p.treatmentCTR * 100,
+        Control: config.unit === 'percent' ? p.controlCTR * 100 : p.controlMetric,
+        Treatment: config.unit === 'percent' ? p.treatmentCTR * 100 : p.treatmentMetric,
         isPost: p.isPostPeriod,
     }));
 
@@ -78,22 +107,22 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                     <tbody>
                         <tr className="control-row">
                             <td>{t('control')}</td>
-                            <td>{formatPercent(result.ctrlPre)}</td>
-                            <td>{formatPercent(result.ctrlPost)}</td>
-                            <td className="delta">{formatPercent(result.ctrlDelta)}</td>
+                            <td>{formatValue(result.ctrlPre)}</td>
+                            <td>{formatValue(result.ctrlPost)}</td>
+                            <td className="delta">{formatValue(result.ctrlDelta)}</td>
                         </tr>
                         <tr className="treatment-row">
                             <td>{t('treatment')}</td>
-                            <td>{formatPercent(result.treatPre)}</td>
-                            <td>{formatPercent(result.treatPost)}</td>
-                            <td className="delta">{formatPercent(result.treatDelta)}</td>
+                            <td>{formatValue(result.treatPre)}</td>
+                            <td>{formatValue(result.treatPost)}</td>
+                            <td className="delta">{formatValue(result.treatDelta)}</td>
                         </tr>
                         <tr className="did-row">
                             <td colSpan={3}>
                                 {t('didEstimate')}
                                 <HelpTooltip steps={t('helpDidEstimate') as unknown as string[]} title={helpTitle} />
                             </td>
-                            <td className="did-value">{formatPercent(result.estimate)}</td>
+                            <td className="did-value">{formatValue(result.estimate)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -107,8 +136,8 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                     <div className="step-content">
                         <h4>{t('computeGroupMeans')}</h4>
                         <div className="step-result">
-                            {t('control')}: {formatPercent(result.ctrlPre)} → {formatPercent(result.ctrlPost)}<br />
-                            {t('treatment')}: {formatPercent(result.treatPre)} → {formatPercent(result.treatPost)}
+                            {t('control')}: {formatValue(result.ctrlPre)} → {formatValue(result.ctrlPost)}<br />
+                            {t('treatment')}: {formatValue(result.treatPre)} → {formatValue(result.treatPost)}
                         </div>
                     </div>
                 </div>
@@ -118,8 +147,8 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                     <div className="step-content">
                         <h4>{t('computeDeltas')}</h4>
                         <div className="step-result">
-                            {t('control')} Δ = {formatPercent(result.ctrlPost)} - {formatPercent(result.ctrlPre)} = <strong>{formatPercent(result.ctrlDelta)}</strong><br />
-                            {t('treatment')} Δ = {formatPercent(result.treatPost)} - {formatPercent(result.treatPre)} = <strong>{formatPercent(result.treatDelta)}</strong>
+                            {t('control')} Δ = {formatValue(result.ctrlPost)} - {formatValue(result.ctrlPre)} = <strong>{formatValue(result.ctrlDelta)}</strong><br />
+                            {t('treatment')} Δ = {formatValue(result.treatPost)} - {formatValue(result.treatPre)} = <strong>{formatValue(result.treatDelta)}</strong>
                         </div>
                     </div>
                 </div>
@@ -129,7 +158,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                     <div className="step-content">
                         <h4>{t('computeDid')}</h4>
                         <div className="step-result">
-                            DiD = {formatPercent(result.treatDelta)} - {formatPercent(result.ctrlDelta)} = <strong className="highlight">{formatPercent(result.estimate)}</strong>
+                            DiD = {formatValue(result.treatDelta)} - {formatValue(result.ctrlDelta)} = <strong className="highlight">{formatValue(result.estimate)}</strong>
                         </div>
                         <p className="step-explain">{t('didRemovesTimeEffect')}</p>
                     </div>
@@ -137,7 +166,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
             </div>
 
             <div className="chart-section">
-                <h3>{t('ctrOverTime')}</h3>
+                <h3>{language === 'zh' ? `${metricLabel} 随时间变化` : `${metricLabel} Over Time`}</h3>
                 <div className="chart-container">
                     <ResponsiveContainer width="100%" height={300}>
                         <LineChart data={chartData} margin={{ top: 20, right: 30, bottom: 40, left: 60 }}>
@@ -149,7 +178,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                             />
                             <YAxis
                                 stroke="rgba(255,255,255,0.5)"
-                                label={{ value: 'CTR (%)', angle: -90, position: 'left', fill: 'rgba(255,255,255,0.6)' }}
+                                label={{ value: `${metricLabel} (${chartUnit})`, angle: -90, position: 'left', fill: 'rgba(255,255,255,0.6)' }}
                             />
                             <Tooltip
                                 contentStyle={{
@@ -197,22 +226,22 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                 <div className="regression-results">
                     <div className="reg-item">
                         <span className="reg-label">{t('intercept')}</span>
-                        <span className="reg-value">{formatPercent(regression.intercept)}</span>
+                        <span className="reg-value">{formatValue(regression.intercept)}</span>
                         <span className="reg-explain">{t('controlPreMean')}</span>
                     </div>
                     <div className="reg-item">
                         <span className="reg-label">{t('treatCoef')}</span>
-                        <span className="reg-value">{formatPercent(regression.treatCoef)}</span>
+                        <span className="reg-value">{formatValue(regression.treatCoef)}</span>
                         <span className="reg-explain">{t('baselineDiff')}</span>
                     </div>
                     <div className="reg-item">
                         <span className="reg-label">{t('postCoef')}</span>
-                        <span className="reg-value">{formatPercent(regression.postCoef)}</span>
+                        <span className="reg-value">{formatValue(regression.postCoef)}</span>
                         <span className="reg-explain">{t('timeEffectControl')}</span>
                     </div>
                     <div className="reg-item highlight">
                         <span className="reg-label">{t('interaction')}</span>
-                        <span className="reg-value">{formatPercent(regression.interactionCoef)}</span>
+                        <span className="reg-value">{formatValue(regression.interactionCoef)}</span>
                         <span className="reg-explain">{t('didEstimateLabel')}</span>
                     </div>
                 </div>
@@ -222,7 +251,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                 <div className="effect-display">
                     <span className="effect-label">{t('didTreatmentEffect')}</span>
                     <span className={`effect-value ${result.estimate > 0 ? 'positive' : 'negative'}`}>
-                        {result.estimate > 0 ? '+' : ''}{formatPercent(result.estimate)}
+                        {result.estimate > 0 ? '+' : ''}{formatValue(result.estimate)}
                     </span>
                 </div>
 
@@ -232,7 +261,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                             {t('stdError')}
                             <HelpTooltip steps={t('helpStandardError') as unknown as string[]} title={helpTitle} />
                         </span>
-                        <span className="stat-value">{formatPercent(result.standardError, 3)}</span>
+                        <span className="stat-value">{formatValue(result.standardError, 3)}</span>
                     </div>
                     <div className="stat-item">
                         <span className="stat-label">

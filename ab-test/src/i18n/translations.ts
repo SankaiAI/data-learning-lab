@@ -12,6 +12,22 @@ export const translations = {
         tabDid: 'DiD',
         tabCompare: 'Compare',
 
+        // Metric Selector
+        metricSelector: 'Metric Type',
+        metricSelectorDesc: 'Choose which metric to analyze. Affects data generation and statistical tests.',
+        metricCTR: 'Click-Through Rate (CTR)',
+        metricConversion: 'Conversion Rate',
+        metricRevenue: 'Revenue (ARPU)',
+        metricDuration: 'Session Duration',
+        metricCTRShort: 'CTR',
+        metricConversionShort: 'Conversion',
+        metricRevenueShort: 'Revenue',
+        metricDurationShort: 'Duration',
+        metricUnit_percent: '',
+        metricUnit_currency: '$',
+        metricUnit_time: 's',
+        baselineValue: 'Baseline Value',
+
         // Control Panel
         simulatorControls: '🎛️ Simulator Controls',
         prePeriod: 'PRE-PERIOD',
@@ -38,8 +54,14 @@ export const translations = {
 
         simulationSettings: 'Simulation Settings',
         eventsPerSecond: 'Events/second',
+        eventsPerSecondDesc: 'How fast events are generated. Higher = faster simulation but harder to observe individual events.',
         noiseLevel: 'Noise Level',
+        noiseLevelDesc: 'Amount of random variation in user behavior. Higher noise = harder to detect true effects, more realistic.',
         totalUsers: 'Total Users',
+        totalUsersDesc: 'Size of the simulated user pool. More users = more statistical power but longer simulation.',
+        helpEventsPerSecond: ['In real experiments, this is your traffic rate', 'Set based on how quickly you want to see results', 'Higher speed = faster learning, lower = easier to observe'],
+        helpNoiseLevel: ['Real user behavior has natural variation', '1.0x = realistic variance', 'Higher values simulate noisier metrics (like revenue)'],
+        helpTotalUsers: ['Corresponds to your experiment sample size', 'More users = tighter confidence intervals', 'In reality, determined by traffic × duration'],
 
         // Live Stream
         liveStream: '📡 Live Stream',
@@ -250,6 +272,7 @@ export const translations = {
         recNoPeeking: 'Avoid stopping early based on interim results (peeking problem)',
         recSeasonality: 'Account for holidays and marketing events',
         recFullWeeks: 'Round up to complete weeks for cleaner analysis',
+        converted: 'Converted',
     },
 
     zh: {
@@ -262,6 +285,22 @@ export const translations = {
         tabCuped: 'CUPED',
         tabDid: '双重差分',
         tabCompare: '方法对比',
+
+        // Metric Selector
+        metricSelector: '指标类型',
+        metricSelectorDesc: '选择要分析的指标。影响数据生成和统计检验。',
+        metricCTR: '点击率 (CTR)',
+        metricConversion: '转化率',
+        metricRevenue: '收入 (ARPU)',
+        metricDuration: '会话时长',
+        metricCTRShort: 'CTR',
+        metricConversionShort: '转化率',
+        metricRevenueShort: '收入',
+        metricDurationShort: '时长',
+        metricUnit_percent: '',
+        metricUnit_currency: '¥',
+        metricUnit_time: '秒',
+        baselineValue: '基线值',
 
         // Control Panel
         simulatorControls: '🎛️ 模拟器控制',
@@ -289,8 +328,14 @@ export const translations = {
 
         simulationSettings: '模拟设置',
         eventsPerSecond: '事件/秒',
+        eventsPerSecondDesc: '事件生成速度。越高 = 模拟越快但更难观察单个事件。',
         noiseLevel: '噪声水平',
+        noiseLevelDesc: '用户行为的随机变化量。噪声越高 = 越难检测真实效应，更接近现实。',
         totalUsers: '总用户数',
+        totalUsersDesc: '模拟用户池的大小。用户越多 = 统计功效越强但模拟时间更长。',
+        helpEventsPerSecond: ['在真实实验中，这是你的流量速率', '根据你想多快看到结果来设置', '速度高 = 学习更快，速度低 = 更易观察'],
+        helpNoiseLevel: ['真实用户行为有自然变化', '1.0x = 真实方差', '更高的值模拟更嘈杂的指标（如收入）'],
+        helpTotalUsers: ['对应你的实验样本量', '用户越多 = 置信区间越窄', '实际中由 流量 × 时长 决定'],
 
         // Live Stream
         liveStream: '📡 实时数据流',
@@ -500,7 +545,8 @@ export const translations = {
         recMinDuration: '至少运行1-2个完整周以捕捉周期性变化',
         recNoPeeking: '避免根据中间结果提前停止（偷看问题）',
         recSeasonality: '考虑节假日和营销活动的影响',
-        recFullWeeks: '向上取整到完整周数以便更清晰的分析',
+        recFullWeeks: '建议凑整周数以获得更清晰的分析',
+        converted: '转化',
     },
 } as const;
 

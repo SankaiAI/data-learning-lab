@@ -1,16 +1,38 @@
-import type { SimulationEvent, AggregatedMetrics } from '../simulation/types';
+import type { SimulationEvent, AggregatedMetrics, MetricType } from '../simulation/types';
+import { METRIC_CONFIGS } from '../simulation/types';
 import { useLanguage } from '../i18n';
 import './LiveStream.css';
 
 interface LiveStreamProps {
     events: SimulationEvent[];
     metrics: AggregatedMetrics;
+    metricType: MetricType;
 }
 
-export function LiveStream({ events, metrics }: LiveStreamProps) {
-    const { t } = useLanguage();
+export function LiveStream({ events, metrics, metricType }: LiveStreamProps) {
+    const { t, language } = useLanguage();
+    const config = METRIC_CONFIGS[metricType];
+
     const formatNumber = (n: number) => n.toLocaleString();
-    const formatPercent = (n: number) => (n * 100).toFixed(2) + '%';
+
+
+    // Format value based on metric type
+    const formatValue = (n: number) => {
+        if (config.unit === 'percent') {
+            return (n * 100).toFixed(2) + '%';
+        } else if (config.unit === 'currency') {
+            const symbol = language === 'zh' ? '¥' : '$';
+            return symbol + n.toFixed(2);
+        } else {
+            const unit = language === 'zh' ? '秒' : 's';
+            return n.toFixed(1) + unit;
+        }
+    };
+
+    // Get value to display in summary (CTR vs Mean)
+    const getSummaryValue = (m: any) => config.isContinuous ? m.metricMean : m.ctr;
+
+
 
     return (
         <div className="live-stream">
@@ -25,12 +47,12 @@ export function LiveStream({ events, metrics }: LiveStreamProps) {
                     <div className="metric-row">
                         <span>{t('prePeriod')}</span>
                         <span>{formatNumber(metrics.control.pre.clicks)}/{formatNumber(metrics.control.pre.impressions)}</span>
-                        <span className="ctr">{formatPercent(metrics.control.pre.ctr)}</span>
+                        <span className="ctr">{formatValue(getSummaryValue(metrics.control.pre))}</span>
                     </div>
                     <div className="metric-row">
                         <span>{t('postPeriod')}</span>
                         <span>{formatNumber(metrics.control.post.clicks)}/{formatNumber(metrics.control.post.impressions)}</span>
-                        <span className="ctr">{formatPercent(metrics.control.post.ctr)}</span>
+                        <span className="ctr">{formatValue(getSummaryValue(metrics.control.post))}</span>
                     </div>
                 </div>
 
@@ -39,12 +61,12 @@ export function LiveStream({ events, metrics }: LiveStreamProps) {
                     <div className="metric-row">
                         <span>{t('prePeriod')}</span>
                         <span>{formatNumber(metrics.treatment.pre.clicks)}/{formatNumber(metrics.treatment.pre.impressions)}</span>
-                        <span className="ctr">{formatPercent(metrics.treatment.pre.ctr)}</span>
+                        <span className="ctr">{formatValue(getSummaryValue(metrics.treatment.pre))}</span>
                     </div>
                     <div className="metric-row">
                         <span>{t('postPeriod')}</span>
                         <span>{formatNumber(metrics.treatment.post.clicks)}/{formatNumber(metrics.treatment.post.impressions)}</span>
-                        <span className="ctr">{formatPercent(metrics.treatment.post.ctr)}</span>
+                        <span className="ctr">{formatValue(getSummaryValue(metrics.treatment.post))}</span>
                     </div>
                 </div>
             </div>
@@ -72,7 +94,9 @@ export function LiveStream({ events, metrics }: LiveStreamProps) {
                                 {event.period === 'pre' ? t('prePeriod') : t('postPeriod')}
                             </span>
                             <span className="result">
-                                {event.click ? t('click') : t('view')}
+                                {event.click ?
+                                    (config.isContinuous ? formatValue(event.metricValue) : (metricType === 'conversion' ? t('converted') : t('click')))
+                                    : t('view')}
                             </span>
                         </div>
                     ))}
