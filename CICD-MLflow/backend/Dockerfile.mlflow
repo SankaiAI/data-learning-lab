@@ -1,0 +1,23 @@
+# MLflow Server Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install MLflow and required dependencies
+RUN pip install --no-cache-dir \
+    mlflow==2.10.0 \
+    psycopg2-binary \
+    boto3
+
+# Expose MLflow port
+EXPOSE 5000
+
+# Default command (overridden in docker-compose)
+CMD ["mlflow", "server", "--host", "0.0.0.0", "--port", "5000"]

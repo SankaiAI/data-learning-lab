@@ -1,0 +1,30 @@
+# MLflow Configuration
+# Defines settings for experiment tracking and model registry
+
+tracking:
+  uri: "${MLFLOW_TRACKING_URI}"
+  experiment_name: "claim-settlement-prediction"
+
+artifact_store:
+  type: "s3"
+  endpoint: "${MLFLOW_S3_ENDPOINT_URL}"
+  bucket: "mlflow-artifacts"
+
+model_registry:
+  model_name: "claim-settlement-model"
+  stages:
+    - "None"
+    - "Staging"
+    - "Production"
+    - "Archived"
+
+tags:
+  project: "claim-ml-cicd-lab"
+  team: "data-science"
+  environment: "development"
+
+logging:
+  auto_log: true
+  log_models: true
+  log_input_examples: true
+  log_model_signatures: true
