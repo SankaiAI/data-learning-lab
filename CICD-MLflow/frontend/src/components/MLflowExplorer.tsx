@@ -5,9 +5,9 @@ import { mlflowApi } from '@/lib/api'
 import { MLflowRun, MLflowArtifact } from '@/types'
 
 export default function MLflowExplorer() {
-  const [runs, setRuns] = useState<MLflowRun[]>([])
-  const [selectedRun, setSelectedRun] = useState<MLflowRun | null>(null)
-  const [artifacts, setArtifacts] = useState<MLflowArtifact[]>([])
+  const [runs, setRuns] = useState<any[]>([])
+  const [selectedRun, setSelectedRun] = useState<any | null>(null)
+  const [artifacts, setArtifacts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState<'all' | 'ci' | 'cd'>('all')
   const [champion, setChampion] = useState<any>(null)
@@ -41,10 +41,15 @@ export default function MLflowExplorer() {
     }
   }
 
-  const selectRun = async (run: MLflowRun) => {
+  // Helper to get run ID (handles both snake_case and camelCase)
+  const getRunId = (run: any) => run?.run_id || run?.runId || 'unknown'
+  const getRunName = (run: any) => run?.run_name || run?.runName || ''
+  const getStartTime = (run: any) => run?.start_time || run?.startTime || 0
+
+  const selectRun = async (run: any) => {
     setSelectedRun(run)
     try {
-      const response = await mlflowApi.listArtifacts(run.runId)
+      const response = await mlflowApi.listArtifacts(getRunId(run))
       setArtifacts(response.artifacts || [])
     } catch (e) {
       console.error('Failed to load artifacts:', e)
@@ -111,17 +116,17 @@ export default function MLflowExplorer() {
             </div>
           ) : (
             <div className="divide-y divide-gray-700">
-              {runs.map(run => (
+              {runs.map((run: any) => (
                 <div
-                  key={run.runId}
+                  key={getRunId(run) || Math.random()}
                   onClick={() => selectRun(run)}
                   className={`p-3 cursor-pointer hover:bg-gray-700/50 ${
-                    selectedRun?.runId === run.runId ? 'bg-gray-700' : ''
+                    getRunId(selectedRun) === getRunId(run) ? 'bg-gray-700' : ''
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-white truncate">
-                      {run.runName || run.runId.slice(0, 8)}
+                      {getRunName(run) || getRunId(run).slice(0, 8)}
                     </span>
                     <span className={`text-xs px-2 py-0.5 rounded ${
                       run.status === 'FINISHED' ? 'bg-emerald-900 text-emerald-200' :
@@ -133,7 +138,7 @@ export default function MLflowExplorer() {
                     </span>
                   </div>
                   <div className="text-xs text-gray-400">
-                    {formatTimestamp(run.startTime)}
+                    {formatTimestamp(getStartTime(run))}
                   </div>
                   {run.tags?.stage && (
                     <span className="text-xs text-blue-400">{run.tags.stage}</span>
@@ -154,11 +159,11 @@ export default function MLflowExplorer() {
                 <div className="text-xs space-y-1">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Run ID:</span>
-                    <code className="text-blue-400">{selectedRun.runId.slice(0, 16)}...</code>
+                    <code className="text-blue-400">{getRunId(selectedRun).slice(0, 16)}...</code>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Started:</span>
-                    <span className="text-gray-300">{formatTimestamp(selectedRun.startTime)}</span>
+                    <span className="text-gray-300">{formatTimestamp(getStartTime(selectedRun))}</span>
                   </div>
                   {selectedRun.tags?.commit_sha && (
                     <div className="flex justify-between">
@@ -206,17 +211,17 @@ export default function MLflowExplorer() {
                 <div>
                   <h4 className="text-xs font-semibold text-gray-400 uppercase mb-2">Artifacts</h4>
                   <div className="space-y-1">
-                    {artifacts.map(artifact => (
+                    {artifacts.map((artifact: any) => (
                       <div
                         key={artifact.path}
                         className="flex items-center justify-between bg-gray-800 rounded p-2 text-xs"
                       >
                         <span className="text-gray-300">
-                          {artifact.isDir ? '📁' : '📄'} {artifact.path}
+                          {(artifact.is_dir || artifact.isDir) ? '📁' : '📄'} {artifact.path}
                         </span>
-                        {!artifact.isDir && (
+                        {!(artifact.is_dir || artifact.isDir) && (
                           <a
-                            href={mlflowApi.getArtifactUrl(selectedRun.runId, artifact.path)}
+                            href={mlflowApi.getArtifactUrl(getRunId(selectedRun), artifact.path)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300"
@@ -229,11 +234,11 @@ export default function MLflowExplorer() {
                   </div>
 
                   {/* Preview images */}
-                  {artifacts.filter(a => a.path.endsWith('.png')).map(img => (
+                  {artifacts.filter((a: any) => a.path.endsWith('.png')).map((img: any) => (
                     <div key={img.path} className="mt-2">
                       <div className="text-xs text-gray-500 mb-1">{img.path}</div>
                       <img
-                        src={mlflowApi.getArtifactUrl(selectedRun.runId, img.path)}
+                        src={mlflowApi.getArtifactUrl(getRunId(selectedRun), img.path)}
                         alt={img.path}
                         className="max-w-full rounded border border-gray-700"
                         onError={(e) => {

@@ -157,9 +157,11 @@ export default function ClaimsStream() {
               Click "Start Stream" to see live claims
             </div>
           ) : (
-            claims.map((claim, idx) => (
-              <ClaimCard key={`${claim.claimId}-${idx}`} claim={claim} />
-            ))
+            claims
+              .filter((claim: any) => claim && (claim.claim_id || claim.claimId))
+              .map((claim: any, idx) => (
+                <ClaimCard key={`${claim.claim_id || claim.claimId || idx}-${idx}`} claim={claim} />
+              ))
           )}
         </div>
       </div>
@@ -196,16 +198,16 @@ export default function ClaimsStream() {
         {/* Drift Status */}
         <div className={`p-3 rounded mb-3 ${
           !driftMetrics ? 'bg-gray-800' :
-          driftMetrics.driftDetected ? 'bg-red-900/30 border border-red-700' :
+          (driftMetrics.drift_detected || driftMetrics.driftDetected) ? 'bg-red-900/30 border border-red-700' :
           'bg-emerald-900/30 border border-emerald-700'
         }`}>
           <div className="text-xs font-medium mb-1">
             {!driftMetrics ? 'Waiting for data...' :
-             driftMetrics.driftDetected ? '⚠ DRIFT DETECTED' : '✓ NO SIGNIFICANT DRIFT'}
+             (driftMetrics.drift_detected || driftMetrics.driftDetected) ? '⚠ DRIFT DETECTED' : '✓ NO SIGNIFICANT DRIFT'}
           </div>
           {driftMetrics && (
             <div className="text-xs text-gray-400">
-              Based on {driftMetrics.sampleSize} samples
+              Based on {driftMetrics.sample_size || driftMetrics.sampleSize || 0} samples
             </div>
           )}
         </div>
@@ -216,24 +218,24 @@ export default function ClaimsStream() {
             <div className="bg-gray-800 rounded p-2">
               <div className="text-gray-500 mb-1">Billed Amount</div>
               <div className="flex justify-between">
-                <span>Current: ${driftMetrics.metrics.billedAmount?.currentMean?.toFixed(2)}</span>
-                <span className={driftMetrics.metrics.billedAmount?.drift > 0.1 ? 'text-amber-400' : 'text-gray-400'}>
-                  Δ {(driftMetrics.metrics.billedAmount?.drift * 100)?.toFixed(1)}%
+                <span>Current: ${(driftMetrics.metrics.billed_amount?.current_mean || driftMetrics.metrics.billedAmount?.currentMean || 0).toFixed(2)}</span>
+                <span className={(driftMetrics.metrics.billed_amount?.drift || driftMetrics.metrics.billedAmount?.drift || 0) > 0.1 ? 'text-amber-400' : 'text-gray-400'}>
+                  Δ {((driftMetrics.metrics.billed_amount?.drift || driftMetrics.metrics.billedAmount?.drift || 0) * 100).toFixed(1)}%
                 </span>
               </div>
             </div>
             <div className="bg-gray-800 rounded p-2">
               <div className="text-gray-500 mb-1">Approval Rate</div>
               <div className="flex justify-between">
-                <span>Current: {(driftMetrics.metrics.approvalRate?.current * 100)?.toFixed(1)}%</span>
-                <span className={driftMetrics.metrics.approvalRate?.drift > 0.05 ? 'text-amber-400' : 'text-gray-400'}>
-                  Δ {(driftMetrics.metrics.approvalRate?.drift * 100)?.toFixed(1)}%
+                <span>Current: {((driftMetrics.metrics.approval_rate?.current || driftMetrics.metrics.approvalRate?.current || 0) * 100).toFixed(1)}%</span>
+                <span className={(driftMetrics.metrics.approval_rate?.drift || driftMetrics.metrics.approvalRate?.drift || 0) > 0.05 ? 'text-amber-400' : 'text-gray-400'}>
+                  Δ {((driftMetrics.metrics.approval_rate?.drift || driftMetrics.metrics.approvalRate?.drift || 0) * 100).toFixed(1)}%
                 </span>
               </div>
             </div>
             <div className="bg-gray-800 rounded p-2">
               <div className="text-gray-500 mb-1">Patient Age</div>
-              <div>Mean: {driftMetrics.metrics.age?.currentMean?.toFixed(1)} years</div>
+              <div>Mean: {(driftMetrics.metrics.age?.current_mean || driftMetrics.metrics.age?.currentMean || 0).toFixed(1)} years</div>
             </div>
           </div>
         )}
@@ -249,30 +251,67 @@ export default function ClaimsStream() {
   )
 }
 
+// Check if object is a valid claim
+function isValidClaim(claim: any): boolean {
+  if (!claim || typeof claim !== 'object') return false
+  // Must have either claim_id or claimId, and billed_amount or billedAmount
+  const hasClaimId = claim.claim_id || claim.claimId
+  const hasBilledAmount = claim.billed_amount !== undefined || claim.billedAmount !== undefined
+  return hasClaimId && hasBilledAmount
+}
+
 // Individual claim card component
-function ClaimCard({ claim }: { claim: Claim }) {
+// Backend sends snake_case, so we handle both formats
+function ClaimCard({ claim }: { claim: any }) {
+  // Skip invalid claims
+  if (!isValidClaim(claim)) {
+    return null
+  }
+
+  // Handle both camelCase and snake_case from backend
+  const claimId = claim.claim_id || claim.claimId || 'N/A'
+  const settlementOutcome = claim.settlement_outcome ?? claim.settlementOutcome ?? 0
+  const settlementLabel = claim.settlement_label || claim.settlementLabel || (settlementOutcome === 1 ? 'Approved' : 'Denied')
+  const billedAmount = Number(claim.billed_amount || claim.billedAmount || 0)
+  const cptBucket = claim.cpt_bucket || claim.cptBucket || 'Unknown'
+  const providerType = claim.provider_type || claim.providerType || 'Unknown'
+  const patientAge = claim.patient_age || claim.patientAge || 0
+
+  // Get last 8 chars of claim ID safely
+  const shortId = typeof claimId === 'string' && claimId.length > 0
+    ? claimId.slice(-8)
+    : 'N/A'
+
   return (
-    <div className={`claim-card flex-shrink-0 w-48 ${
-      claim.settlementOutcome === 1
-        ? 'border-l-2 border-l-emerald-500'
-        : 'border-l-2 border-l-red-500'
+    <div className={`flex-shrink-0 w-52 bg-gray-800 border border-gray-700 rounded-lg p-3 ${
+      settlementOutcome === 1
+        ? 'border-l-4 border-l-emerald-500'
+        : 'border-l-4 border-l-red-500'
     }`}>
-      <div className="flex justify-between items-start mb-1">
-        <code className="text-xs text-gray-500">{claim.claimId.slice(-10)}</code>
-        <span className={`text-xs font-medium ${
-          claim.settlementOutcome === 1 ? 'text-emerald-400' : 'text-red-400'
+      {/* Status Badge */}
+      <div className="flex justify-end mb-2">
+        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+          settlementOutcome === 1
+            ? 'bg-emerald-900 text-emerald-300'
+            : 'bg-red-900 text-red-300'
         }`}>
-          {claim.settlementLabel}
+          {settlementLabel}
         </span>
       </div>
-      <div className="text-sm font-semibold text-white mb-1">
-        ${claim.billedAmount.toFixed(2)}
+      {/* Amount */}
+      <div className="text-lg font-bold text-white mb-1">
+        ${billedAmount.toFixed(2)}
       </div>
-      <div className="text-xs text-gray-400 truncate" title={claim.cptBucket}>
-        {claim.cptBucket}
+      {/* Details */}
+      <div className="text-xs text-gray-400 truncate mb-1" title={cptBucket}>
+        {cptBucket}
       </div>
-      <div className="text-xs text-gray-500">
-        {claim.providerType} • Age {claim.patientAge}
+      <div className="text-xs text-gray-500 mb-2">
+        {providerType} • Age {patientAge}
+      </div>
+      {/* Claim ID */}
+      <div className="text-xs text-gray-600 font-mono">
+        ID: {shortId}
       </div>
     </div>
   )

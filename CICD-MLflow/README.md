@@ -92,6 +92,106 @@ An enterprise CI/CD simulation for medical claim ML pipelines with real MLflow t
 
 > **Note**: MinIO is used for artifact storage behind the scenes. You don't need to log into it for normal usage - it's only needed if you want to browse stored artifacts directly.
 
+## UI Guide - Step by Step
+
+### Understanding the Interface
+
+The UI is divided into 4 main areas:
+
+```
+┌─────────────────┬─────────────────────┬─────────────────┐
+│  Pipeline DAG   │   Step Inspector    │ MLflow Explorer │
+│    (left)       │     (center)        │    (right)      │
+├─────────────────┴─────────────────────┴─────────────────┤
+│              Claims Stream & Drift Monitor              │
+│                      (bottom)                           │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Step 1: Start a Pipeline Run
+
+1. Click the **"+ Fake Commit"** button in the top-right header
+2. This simulates a new git commit and automatically starts the CI pipeline
+3. You'll see a new `run_id` appear in the header
+
+### Step 2: Watch the CI Pipeline Execute
+
+1. In the **Pipeline DAG** (left panel), watch the nodes change color:
+   - Gray = Idle
+   - Blue (pulsing) = Running
+   - Green = Success
+   - Red = Failed
+2. Click on any node to inspect it in the center panel
+
+### Step 3: Inspect a Step
+
+When you click a pipeline node, the **Step Inspector** (center) shows 4 tabs:
+
+| Tab | Description |
+|-----|-------------|
+| **Code** | The actual Python script that runs for this step |
+| **Config** | YAML/JSON configuration used by the step |
+| **Logs** | Real-time streaming logs while the step runs |
+| **Outputs** | Metrics, artifacts, and results after completion |
+
+### Step 4: Continue to CD Stage
+
+1. After CI completes (all CI nodes turn green), the status shows "ci_complete"
+2. Click **"Continue to CD →"** button in the header
+3. The CD pipeline (Full Train → Evaluate → Approval) starts running
+
+### Step 5: Approve or Reject Deployment
+
+1. When the pipeline reaches the **Manual Approval** step, it pauses
+2. The status shows "awaiting_approval"
+3. Review the metrics in the Step Inspector (Outputs tab):
+   - Challenger vs Champion model comparison
+   - Improvement percentage
+4. Click **"✓ Approve"** to proceed to deployment, or **"✗ Reject"** to stop
+
+### Step 6: Monitor Deployment
+
+After approval:
+1. The model deploys to **Staging**
+2. **Shadow monitoring** runs to detect drift
+3. If no issues, the model promotes to **Production**
+
+### Step 7: View MLflow Runs
+
+In the **MLflow Explorer** (right panel):
+1. Filter runs by stage: `CI`, `CD`, or `All`
+2. Click on a run to see:
+   - Parameters (model settings)
+   - Metrics (accuracy, F1, AUC-ROC)
+   - Artifacts (plots, model files)
+3. Click **"MLflow UI ↗"** in the header for the full MLflow interface
+
+### Step 8: Monitor Live Claims
+
+In the **Claims Stream** (bottom panel):
+1. Click **"Start Stream"** to begin generating synthetic claims
+2. Watch claims flow in real-time (shows approved/denied)
+3. The **Drift Monitor** shows:
+   - PSI (Population Stability Index)
+   - Current vs reference statistics
+   - Drift detection alerts
+
+### Step 9: Test Failure Scenarios
+
+1. Click **"Failure Modes"** button in the header
+2. Toggle on a failure scenario:
+   - **Schema Validation**: Data validation will fail
+   - **Metric Regression**: Model performs worse than champion
+   - **MLflow Connection**: MLflow logging fails
+   - **Training Error**: CI tests fail
+3. Start a new pipeline to see how failures are handled
+
+### Step 10: Rollback (if needed)
+
+1. Click **"Rollback"** button in the header
+2. This reverts production to the previous model version
+3. Check the logs to confirm rollback success
+
 ## Pipeline Stages
 
 ### CI (Continuous Integration)
