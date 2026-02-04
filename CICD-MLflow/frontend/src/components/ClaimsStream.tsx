@@ -73,9 +73,41 @@ export default function ClaimsStream() {
 
   const startStream = async () => {
     try {
-      await claimsApi.startStream(streamInterval)
-      connectWebSocket()
-      setClaimsStreamActive(true)
+      // Connect WebSocket FIRST and wait for it to be ready
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000'
+      const ws = new WebSocket(`${wsUrl}/ws/claims`)
+
+      wsRef.current = ws
+
+      ws.onopen = async () => {
+        setWsConnected(true)
+        // Only start the stream AFTER WebSocket is connected
+        await claimsApi.startStream(streamInterval)
+        setClaimsStreamActive(true)
+      }
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data)
+
+          if (message.type === 'claim') {
+            addClaim(message.data)
+          } else if (message.type === 'drift') {
+            setDriftMetrics(message.data)
+          }
+        } catch (e) {
+          console.error('Claims WS message error:', e)
+        }
+      }
+
+      ws.onclose = () => {
+        setWsConnected(false)
+      }
+
+      ws.onerror = (error) => {
+        console.error('Claims WS error:', error)
+        setWsConnected(false)
+      }
     } catch (e) {
       console.error('Failed to start stream:', e)
     }
@@ -106,16 +138,15 @@ export default function ClaimsStream() {
   const driftLevel = getDriftLevel()
 
   return (
-    <div className="h-full flex">
+    <div className="h-full flex overflow-hidden">
       {/* Claims Stream (left) */}
-      <div className="flex-1 flex flex-col border-r border-gray-700">
+      <div className="flex-1 min-w-0 flex flex-col border-r border-gray-700">
         {/* Stream Controls */}
         <div className="p-2 border-b border-gray-700 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-400">Live Claims Feed</span>
-            <span className={`w-2 h-2 rounded-full ${
-              claimsStreamActive && wsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500'
-            }`} />
+            <span className={`w-2 h-2 rounded-full ${claimsStreamActive && wsConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-500'
+              }`} />
           </div>
           <div className="flex items-center space-x-2">
             <select
@@ -167,18 +198,17 @@ export default function ClaimsStream() {
       </div>
 
       {/* Drift Monitor (right) */}
-      <div className="w-80 p-3 flex flex-col">
+      <div className="w-80 flex-shrink-0 p-3 flex flex-col overflow-y-auto">
         <h3 className="text-sm font-semibold text-gray-300 mb-3">Drift Monitor</h3>
 
         {/* PSI Meter */}
         <div className="mb-4">
           <div className="flex justify-between text-xs mb-1">
             <span className="text-gray-400">Population Stability Index (PSI)</span>
-            <span className={`font-medium ${
-              driftLevel.level === 'low' ? 'text-emerald-400' :
+            <span className={`font-medium ${driftLevel.level === 'low' ? 'text-emerald-400' :
               driftLevel.level === 'medium' ? 'text-amber-400' :
-              'text-red-400'
-            }`}>
+                'text-red-400'
+              }`}>
               {driftMetrics?.psi?.toFixed(4) || '0.0000'}
             </span>
           </div>
@@ -196,14 +226,13 @@ export default function ClaimsStream() {
         </div>
 
         {/* Drift Status */}
-        <div className={`p-3 rounded mb-3 ${
-          !driftMetrics ? 'bg-gray-800' :
+        <div className={`p-3 rounded mb-3 ${!driftMetrics ? 'bg-gray-800' :
           (driftMetrics.drift_detected || driftMetrics.driftDetected) ? 'bg-red-900/30 border border-red-700' :
-          'bg-emerald-900/30 border border-emerald-700'
-        }`}>
+            'bg-emerald-900/30 border border-emerald-700'
+          }`}>
           <div className="text-xs font-medium mb-1">
             {!driftMetrics ? 'Waiting for data...' :
-             (driftMetrics.drift_detected || driftMetrics.driftDetected) ? '⚠ DRIFT DETECTED' : '✓ NO SIGNIFICANT DRIFT'}
+              (driftMetrics.drift_detected || driftMetrics.driftDetected) ? '⚠ DRIFT DETECTED' : '✓ NO SIGNIFICANT DRIFT'}
           </div>
           {driftMetrics && (
             <div className="text-xs text-gray-400">
@@ -283,18 +312,16 @@ function ClaimCard({ claim }: { claim: any }) {
     : 'N/A'
 
   return (
-    <div className={`flex-shrink-0 w-52 bg-gray-800 border border-gray-700 rounded-lg p-3 ${
-      settlementOutcome === 1
-        ? 'border-l-4 border-l-emerald-500'
-        : 'border-l-4 border-l-red-500'
-    }`}>
+    <div className={`flex-shrink-0 w-52 bg-gray-800 border border-gray-700 rounded-lg p-3 ${settlementOutcome === 1
+      ? 'border-l-4 border-l-emerald-500'
+      : 'border-l-4 border-l-red-500'
+      }`}>
       {/* Status Badge */}
       <div className="flex justify-end mb-2">
-        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
-          settlementOutcome === 1
-            ? 'bg-emerald-900 text-emerald-300'
-            : 'bg-red-900 text-red-300'
-        }`}>
+        <span className={`text-xs font-medium px-2 py-0.5 rounded ${settlementOutcome === 1
+          ? 'bg-emerald-900 text-emerald-300'
+          : 'bg-red-900 text-red-300'
+          }`}>
           {settlementLabel}
         </span>
       </div>

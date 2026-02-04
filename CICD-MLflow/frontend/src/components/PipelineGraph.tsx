@@ -54,11 +54,11 @@ function StepNode({ data }: { data: { label: string; status: StepStatus; stage: 
           inline-block w-2 h-2 rounded-full
           ${data.status === 'idle' ? 'bg-gray-500' :
             data.status === 'queued' ? 'bg-amber-400' :
-            data.status === 'running' ? 'bg-blue-400 animate-pulse' :
-            data.status === 'success' ? 'bg-emerald-400' :
-            data.status === 'failed' ? 'bg-red-400' :
-            data.status === 'awaiting_approval' ? 'bg-purple-400 animate-pulse' :
-            'bg-gray-500'
+              data.status === 'running' ? 'bg-blue-400 animate-pulse' :
+                data.status === 'success' ? 'bg-emerald-400' :
+                  data.status === 'failed' ? 'bg-red-400' :
+                    data.status === 'awaiting_approval' ? 'bg-purple-400 animate-pulse' :
+                      'bg-gray-500'
           }
         `} />
       </div>
@@ -149,7 +149,12 @@ export default function PipelineGraph() {
       { id: 'e11', source: 'promote_prod', target: 'rollback', style: { strokeDasharray: '3,3', stroke: '#ef4444' }, animated: steps.rollback?.status === 'running' },
     )
 
-    return edgeList.map(edge => ({
+    // Filter edges to only include those where both source and target nodes exist
+    const validEdges = edgeList.filter(edge =>
+      steps[edge.source] && steps[edge.target]
+    )
+
+    return validEdges.map(edge => ({
       ...edge,
       markerEnd: { type: MarkerType.ArrowClosed, width: 15, height: 15, color: '#6b7280' },
       style: { stroke: '#6b7280', strokeWidth: 2, ...edge.style }
@@ -161,7 +166,7 @@ export default function PipelineGraph() {
   }, [setSelectedStep])
 
   return (
-    <div className="w-full h-full bg-gray-900">
+    <div className="w-full h-full bg-gray-900 relative">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -181,8 +186,8 @@ export default function PipelineGraph() {
         />
       </ReactFlow>
 
-      {/* Stage Legend */}
-      <div className="absolute bottom-4 left-4 flex space-x-4 text-xs">
+      {/* Stage Legend - positioned at bottom-right to avoid ReactFlow controls */}
+      <div className="absolute bottom-2 right-2 flex space-x-3 text-xs bg-gray-900/80 px-2 py-1 rounded z-10">
         <div className="flex items-center">
           <span className="w-3 h-3 rounded bg-cyan-900 border border-cyan-500 mr-1"></span>
           <span className="text-gray-400">CI</span>

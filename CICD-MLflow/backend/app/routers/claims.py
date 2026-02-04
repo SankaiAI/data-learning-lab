@@ -238,21 +238,21 @@ def calculate_drift_metrics(
     psi = billed_drift * 0.5 + approval_drift * 0.5
 
     return {
-        "psi": round(psi, 4),
-        "drift_detected": psi > 0.2,
+        "psi": float(round(psi, 4)),
+        "drift_detected": bool(psi > 0.2),
         "metrics": {
             "billed_amount": {
-                "current_mean": round(np.mean(current_billed), 2),
-                "reference_mean": ref_mean_billed,
-                "drift": round(billed_drift, 4)
+                "current_mean": float(round(np.mean(current_billed), 2)),
+                "reference_mean": float(ref_mean_billed),
+                "drift": float(round(billed_drift, 4))
             },
             "approval_rate": {
-                "current": round(current_approval, 3),
-                "reference": ref_approval,
-                "drift": round(approval_drift, 4)
+                "current": float(round(current_approval, 3)),
+                "reference": float(ref_approval),
+                "drift": float(round(approval_drift, 4))
             },
             "age": {
-                "current_mean": round(np.mean(current_ages), 1)
+                "current_mean": float(round(np.mean(current_ages), 1))
             }
         },
         "sample_size": len(current_batch),
@@ -343,7 +343,7 @@ async def start_stream(
         }
 
         batch = []
-        batch_size = 10
+        batch_size = 5  # Reduced from 10 for faster feedback
 
         while streaming_active:
             claim = generate_synthetic_claim()
@@ -352,11 +352,12 @@ async def start_stream(
             # Send claim event
             await ws_manager.send_claim_event(claim)
 
-            # Calculate and send drift every batch_size claims
-            if len(batch) >= batch_size:
+            # Calculate and send drift every batch_size claims (or immediately after 3 for first batch)
+            if len(batch) >= batch_size or (len(batch) >= 3 and len(batch) == 3):
                 drift = calculate_drift_metrics(batch, reference_stats)
                 await ws_manager.send_drift_update(drift)
-                batch = []
+                if len(batch) >= batch_size:
+                    batch = []
 
             await asyncio.sleep(interval_ms / 1000)
 
