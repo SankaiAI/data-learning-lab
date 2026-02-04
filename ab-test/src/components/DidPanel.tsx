@@ -65,6 +65,15 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
         isPost: p.isPostPeriod,
     }));
 
+    // Format time for x-axis labels (human-readable)
+    const formatTime = (seconds: number): string => {
+        if (seconds < 60) return `${Math.round(seconds)}${t('second')}`;
+        if (seconds < 3600) return `${Math.round(seconds / 60)}${t('minute')}`;
+        if (seconds < 86400) return `${(seconds / 3600).toFixed(1)}${t('hour')}`;
+        if (seconds < 604800) return `${(seconds / 86400).toFixed(1)}${t('day')}`;
+        return `${(seconds / 604800).toFixed(1)}${t('week')}`;
+    };
+
     const helpTitle = language === 'zh' ? t('helpTitleZh') : t('helpTitle');
 
     return (
@@ -85,7 +94,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
 
             {!parallelCheck.isParallel && (
                 <div className="warning-banner">
-                    <span className="warning-icon">⚠️</span>
+                    <span className="warning-icon">!</span>
                     <div>
                         <strong>{t('parallelTrendsWarning')}</strong>
                         <p>{parallelCheck.warning}</p>
@@ -174,7 +183,8 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                             <XAxis
                                 dataKey="time"
                                 stroke="rgba(255,255,255,0.5)"
-                                label={{ value: 'Time (seconds)', position: 'bottom', fill: 'rgba(255,255,255,0.6)' }}
+                                tickFormatter={formatTime}
+                                label={{ value: language === 'zh' ? '时间' : 'Time', position: 'bottom', fill: 'rgba(255,255,255,0.6)' }}
                             />
                             <YAxis
                                 stroke="rgba(255,255,255,0.5)"
@@ -187,14 +197,15 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                                     borderRadius: '8px',
                                     color: 'white'
                                 }}
+                                labelFormatter={(label) => formatTime(Number(label))}
                             />
-                            <Legend />
+                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
                             <ReferenceLine
                                 x={launchTime}
                                 stroke="#f5576c"
                                 strokeWidth={2}
                                 strokeDasharray="5 5"
-                                label={{ value: 'Launch', fill: '#f5576c', position: 'top' }}
+                                label={{ value: language === 'zh' ? '启动' : 'Launch', fill: '#f5576c', position: 'top' }}
                             />
                             <Line
                                 type="monotone"
@@ -203,6 +214,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                                 stroke="#667eea"
                                 strokeWidth={2}
                                 dot={false}
+                                isAnimationActive={false}
                             />
                             <Line
                                 type="monotone"
@@ -211,6 +223,7 @@ export function DidPanel({ result, timeSeries, launchTime, parallelCheck, regres
                                 stroke="#38ef7d"
                                 strokeWidth={2}
                                 dot={false}
+                                isAnimationActive={false}
                             />
                         </LineChart>
                     </ResponsiveContainer>

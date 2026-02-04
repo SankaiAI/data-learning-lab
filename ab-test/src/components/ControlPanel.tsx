@@ -12,8 +12,7 @@ interface ControlPanelProps {
     onStart: () => void;
     onPause: () => void;
     onReset: () => void;
-    onExportJSON: () => void;
-    onExportCSV: () => void;
+    onFastForward: (days: number) => void;
 }
 
 // Helper to format baseline value based on metric type
@@ -34,6 +33,34 @@ function formatBaselineValue(value: number, metricType: MetricType, language: st
     }
 }
 
+// Helper to format duration
+function formatDuration(seconds: number, t: any): string {
+    if (seconds < 60) return `${seconds.toFixed(1)}${t('second')}`;
+
+    const units = [
+        { key: 'month', seconds: 2592000 },
+        { key: 'week', seconds: 604800 },
+        { key: 'day', seconds: 86400 },
+        { key: 'hour', seconds: 3600 },
+        { key: 'minute', seconds: 60 },
+        { key: 'second', seconds: 1 },
+    ];
+
+    let remaining = seconds;
+    const parts = [];
+
+    for (const unit of units) {
+        if (remaining >= unit.seconds) {
+            const value = Math.floor(remaining / unit.seconds);
+            remaining %= unit.seconds;
+            parts.push(`${value}${t(unit.key)}`);
+        }
+    }
+
+    // Show top 3 significant units
+    return parts.slice(0, 3).join(' ');
+}
+
 export function ControlPanel({
     config,
     isRunning,
@@ -42,8 +69,7 @@ export function ControlPanel({
     onStart,
     onPause,
     onReset,
-    onExportJSON,
-    onExportCSV,
+    onFastForward,
 }: ControlPanelProps) {
     const { t, language } = useLanguage();
     const helpTitle = language === 'zh' ? t('helpTitleZh') : t('helpTitle');
@@ -67,11 +93,11 @@ export function ControlPanel({
                         {isPrePeriod ? t('prePeriod') : t('postPeriod')}
                     </span>
                     {isPrePeriod && isRunning && (
-                        <span style={{ fontSize: '0.8rem', color: '#a8edea', fontWeight: 'bold' }}>
+                        <span className="countdown">
                             T-{Math.ceil(config.launchTime - elapsedTime)}s
                         </span>
                     )}
-                    <span className="elapsed-time">{elapsedTime.toFixed(1)}s</span>
+                    <span className="elapsed-time">{formatDuration(elapsedTime, t)}</span>
                 </div>
             </div>
 
@@ -88,12 +114,34 @@ export function ControlPanel({
                 <button className="btn btn-secondary" onClick={onReset}>
                     {t('reset')}
                 </button>
-                <button className="btn btn-outline" onClick={onExportCSV}>
-                    {t('exportCSV')}
-                </button>
-                <button className="btn btn-outline" onClick={onExportJSON}>
-                    {t('exportJSON')}
-                </button>
+            </div>
+
+            <div className="speed-controls">
+                <div className="speed-group">
+                    <span className="speed-label">{t('speed')}:</span>
+                    {[1, 10, 50].map(s => (
+                        <button
+                            key={s}
+                            className={`btn-speed ${config.speed === s ? 'active' : ''}`}
+                            onClick={() => onUpdateConfig({ speed: s })}
+                        >
+                            {s}x
+                        </button>
+                    ))}
+                </div>
+
+                <div className="jump-group">
+                    <span className="jump-label">{t('jumpLabel')}</span>
+                    <button className="btn-jump" onClick={() => onFastForward(1 / 24)}>
+                        {t('jumpHour')}
+                    </button>
+                    <button className="btn-jump" onClick={() => onFastForward(1)}>
+                        {t('jumpDay')}
+                    </button>
+                    <button className="btn-jump" onClick={() => onFastForward(7)}>
+                        1w
+                    </button>
+                </div>
             </div>
 
             <div className="control-section metric-selector-section">

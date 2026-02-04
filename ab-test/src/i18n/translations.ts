@@ -3,7 +3,7 @@ export type Language = 'en' | 'zh';
 export const translations = {
     en: {
         // Header
-        appTitle: '🧪 A/B Testing Learning Lab',
+        appTitle: 'A/B Testing Learning Lab',
         appSubtitle: 'Interactive demonstration of CUPED variance reduction and Difference-in-Differences',
 
         // Tabs
@@ -29,14 +29,14 @@ export const translations = {
         baselineValue: 'Baseline Value',
 
         // Control Panel
-        simulatorControls: '🎛️ Simulator Controls',
+        simulatorControls: 'Simulator Controls',
         prePeriod: 'PRE-PERIOD',
         postPeriod: 'POST-PERIOD',
-        start: '▶ Start',
-        pause: '⏸ Pause',
-        reset: '🔄 Reset',
-        exportCSV: '📥 CSV',
-        exportJSON: '📦 JSON',
+        start: 'Start',
+        pause: 'Pause',
+        reset: 'Reset',
+        exportCSV: 'CSV',
+        exportJSON: 'JSON',
 
         treatmentSettings: 'Treatment Settings',
         treatmentEffect: 'Treatment Effect',
@@ -64,7 +64,7 @@ export const translations = {
         helpTotalUsers: ['Corresponds to your experiment sample size', 'More users = tighter confidence intervals', 'In reality, determined by traffic × duration'],
 
         // Live Stream
-        liveStream: '📡 Live Stream',
+        liveStream: 'Live Stream',
         events: 'events',
         controlGroup: 'Control Group',
         treatmentGroup: 'Treatment Group',
@@ -73,30 +73,34 @@ export const translations = {
         group: 'Group',
         period: 'Period',
         result: 'Result',
-        click: '🖱️ Click',
-        view: '👁️ View',
+        click: 'Click',
+        view: 'View',
 
         // Raw A/B Panel
-        rawABResult: '📊 Raw A/B Result',
+        rawABResult: 'Raw A/B Result',
         naivePostComparison: 'Naive Post-Period Comparison',
         baselineImbalanceDetected: 'Baseline Imbalance Detected!',
         baselineImbalanceWarning: 'Pre-period CTR differs. Naive comparison may be biased. Consider using CUPED.',
         whatIsThis: 'What is this?',
         rawABExplanation: 'The simplest approach: compare post-period CTRs directly.',
-        rawABCaveat: '⚠️ Ignores pre-period data, affected by baseline differences and time trends.',
+        rawABCaveat: 'Ignores pre-period data, affected by baseline differences and time trends.',
         controlCTR: 'Control CTR',
         treatmentCTR: 'Treatment CTR',
         observedDifference: 'Observed Difference',
         relativeLift: 'relative lift',
         confidenceInterval: '95% Confidence Interval',
+        mde: 'Minimum Detectable Effect (MDE)',
+        power: 'Statistical Power (1 - β)',
+        significance: 'Significance Level (α)',
+        sampleSize: 'Required Sample Size',
         standardError: 'Standard Error',
         pValue: 'P-value',
         significant: 'Significant?',
-        yes: '✓ Yes',
-        no: '✗ No',
+        yes: 'Yes',
+        no: 'No',
 
         // CUPED Panel
-        cupedWalkthrough: '🎯 CUPED Walkthrough',
+        cupedWalkthrough: 'CUPED Walkthrough',
         cupedSubtitle: 'Controlled-experiment Using Pre-Experiment Data',
         whatIsCuped: 'What is CUPED?',
         cupedExplanation: 'CUPED uses pre-period behavior to reduce variance in our estimate. If users who clicked a lot before the experiment also click a lot after, we can "control" for this baseline behavior and get a more precise estimate.',
@@ -110,6 +114,7 @@ export const translations = {
         step4Title: 'Compute adjusted outcomes',
         preVsPostCTR: 'Pre vs Post CTR (per user)',
         scatterExplain: 'Each dot is a user. The correlation between X and Y axes shows how predictive pre-period behavior is. Higher correlation = more variance reduction from CUPED.',
+        noScatterData: 'Scatter data will appear after the experiment launches and post-period data is collected.',
         varianceReduction: 'Variance Reduction',
         before: 'Before (Raw)',
         after: 'After (CUPED)',
@@ -121,12 +126,12 @@ export const translations = {
         stdError: 'Std Error',
 
         // DiD Panel
-        didWalkthrough: '📈 Difference-in-Differences',
+        didWalkthrough: 'Difference-in-Differences',
         didSubtitle: 'Removing Global Time Effects',
         whatIsDid: 'What is DiD?',
         didExplanation: 'DiD compares the change in each group from pre to post period. If something affects both groups equally (like seasonality), it cancels out.',
         parallelTrendsWarning: 'Parallel Trends Warning!',
-        parallelTrendsCaveat: '⚠️ Assumes "parallel trends": without treatment, both groups would have changed similarly.',
+        parallelTrendsCaveat: 'Assumes "parallel trends": without treatment, both groups would have changed similarly.',
         didTable: '2×2 DiD Table',
         prePeriodLabel: 'Pre-Period',
         postPeriodLabel: 'Post-Period',
@@ -152,7 +157,7 @@ export const translations = {
         didTreatmentEffect: 'DiD Treatment Effect',
 
         // Compare Panel
-        compareMethods: '⚖️ Compare Methods',
+        compareMethods: 'Compare Methods',
         sideByAnalysis: 'Side-by-Side Analysis',
         trueEffectConfigured: 'True Treatment Effect (Configured)',
         naiveAB: 'Naive A/B',
@@ -161,8 +166,8 @@ export const translations = {
         cupedDesc: 'Variance reduction using pre-period',
         did: 'DiD',
         didDesc: 'Difference-in-differences',
-        strengths: '✓ Strengths',
-        weaknesses: '✗ Weaknesses',
+        strengths: 'Strengths',
+        weaknesses: 'Weaknesses',
         whenToUse: 'When to use:',
 
         // Pros/Cons
@@ -185,7 +190,7 @@ export const translations = {
         whenDid: 'Use when there are external factors affecting both groups over time.',
 
         // Sanity Checks
-        sanityChecks: '🔍 Sanity Checks',
+        sanityChecks: 'Sanity Checks',
         srmCheck: 'Sample Ratio Mismatch (SRM)',
         srmOk: 'No significant sample ratio mismatch detected.',
         srmWarning: 'Warning: Sample sizes differ significantly from 50/50 split. Check for assignment bugs.',
@@ -196,7 +201,7 @@ export const translations = {
         parallelTrendsExplain: 'Check the DiD panel\'s time series chart. Before the launch line, both groups should move roughly in parallel.',
 
         // Key Insights
-        keyInsights: '💡 Key Insights',
+        keyInsights: 'Key Insights',
         insightImbalance: 'When imbalance is high: CUPED and DiD will give more accurate estimates than simple A/B comparison.',
         insightTrends: 'When time trends exist: DiD removes common trends. Naive A/B will attribute trend effects to treatment.',
         insightPower: 'For maximum power: CUPED typically reduces variance most, giving tighter confidence intervals and earlier significance.',
@@ -226,7 +231,7 @@ export const translations = {
 
         // Sample Size Calculator
         tabSampleSize: 'Sample Size',
-        sampleSizeCalculator: '🧮 Sample Size Calculator',
+        sampleSizeCalculator: 'Sample Size Calculator',
         sampleSizeSubtitle: 'Pre-Experiment Planning',
         whatIsSampleSize: 'Why Calculate Sample Size?',
         sampleSizeExplanation: 'Before running an A/B test, you must determine how many users you need. Too few users = no statistical power. Too many = wasted time and resources.',
@@ -235,9 +240,9 @@ export const translations = {
         baselineCTRDesc: 'Your current conversion rate before the experiment. Get this from your analytics (e.g., 5% = 5 out of 100 users convert).',
         mdeLabel: 'Minimum Detectable Effect (MDE)',
         mdeDesc: 'The smallest improvement you want to detect. Smaller MDE = more users needed. Choose based on business impact (e.g., 1% lift = need to detect if CTR goes from 5% to 5.05%).',
-        statisticalPower: 'Statistical Power',
+        statisticalPower: 'Statistical Power (1 - β)',
         powerDesc: 'Probability of detecting a real effect when it exists. 80% is standard (means 4 out of 5 times you\'ll detect a true effect). Higher = more confident but more users needed.',
-        significanceLevel: 'Significance Level',
+        significanceLevel: 'Significance Level (α)',
         significanceDesc: 'Probability of a false positive (declaring a winner when there isn\'t one). 5% is standard. Lower = fewer false alarms but more users needed.',
         dailyTraffic: 'Daily Traffic',
         dailyTrafficDesc: 'Average number of eligible users visiting per day. Get this from your analytics dashboard.',
@@ -267,17 +272,28 @@ export const translations = {
         durationFormula: 'Duration = (2 × n) / (Daily_Traffic × Allocation)',
 
         // Recommendations
-        recommendations: '💡 Recommendations',
+        recommendations: 'Recommendations',
         recMinDuration: 'Run for at least 1-2 full weeks to capture weekly cycles',
         recNoPeeking: 'Avoid stopping early based on interim results (peeking problem)',
         recSeasonality: 'Account for holidays and marketing events',
         recFullWeeks: 'Round up to complete weeks for cleaner analysis',
         converted: 'Converted',
+        speed: 'Speed',
+        jumpWeek: 'Jump 1 Week',
+        jumpDay: '1d',
+        jumpHour: '1h',
+        jumpLabel: 'Jump:',
+        month: 'M',
+        week: 'w',
+        day: 'd',
+        hour: 'h',
+        minute: 'm',
+        second: 's',
     },
 
     zh: {
         // Header
-        appTitle: '🧪 A/B 测试学习实验室',
+        appTitle: 'A/B 测试学习实验室',
         appSubtitle: 'CUPED 方差缩减和双重差分法的互动演示',
 
         // Tabs
@@ -303,14 +319,14 @@ export const translations = {
         baselineValue: '基线值',
 
         // Control Panel
-        simulatorControls: '🎛️ 模拟器控制',
+        simulatorControls: '模拟器控制',
         prePeriod: '实验前期',
         postPeriod: '实验后期',
-        start: '▶ 开始',
-        pause: '⏸ 暂停',
-        reset: '🔄 重置',
-        exportCSV: '📥 CSV',
-        exportJSON: '📦 JSON',
+        start: '开始',
+        pause: '暂停',
+        reset: '重置',
+        exportCSV: 'CSV',
+        exportJSON: 'JSON',
 
         treatmentSettings: '实验组设置',
         treatmentEffect: '处理效应',
@@ -338,7 +354,7 @@ export const translations = {
         helpTotalUsers: ['对应你的实验样本量', '用户越多 = 置信区间越窄', '实际中由 流量 × 时长 决定'],
 
         // Live Stream
-        liveStream: '📡 实时数据流',
+        liveStream: '实时数据流',
         events: '事件',
         controlGroup: '对照组',
         treatmentGroup: '实验组',
@@ -347,30 +363,34 @@ export const translations = {
         group: '分组',
         period: '时期',
         result: '结果',
-        click: '🖱️ 点击',
-        view: '👁️ 浏览',
+        click: '点击',
+        view: '浏览',
 
         // Raw A/B Panel
-        rawABResult: '📊 原始 A/B 结果',
+        rawABResult: '原始 A/B 结果',
         naivePostComparison: '简单的实验后期比较',
         baselineImbalanceDetected: '检测到基线不平衡！',
         baselineImbalanceWarning: '实验前期CTR存在差异。简单比较可能有偏差。建议使用CUPED。',
         whatIsThis: '这是什么？',
         rawABExplanation: '最简单的方法：直接比较实验后期的CTR。',
-        rawABCaveat: '⚠️ 忽略实验前期数据，受基线差异和时间趋势影响。',
+        rawABCaveat: '忽略实验前期数据，受基线差异和时间趋势影响。',
         controlCTR: '对照组 CTR',
         treatmentCTR: '实验组 CTR',
         observedDifference: '观察到的差异',
         relativeLift: '相对提升',
         confidenceInterval: '95% 置信区间',
+        mde: '最小可检测效应 (MDE)',
+        power: '统计功效 (1 - β)',
+        significance: '显著性水平 (α)',
+        sampleSize: '所需样本量',
         standardError: '标准误差',
         pValue: 'P值',
         significant: '显著？',
-        yes: '✓ 是',
-        no: '✗ 否',
+        yes: '是',
+        no: '否',
 
         // CUPED Panel
-        cupedWalkthrough: '🎯 CUPED 详解',
+        cupedWalkthrough: 'CUPED 详解',
         cupedSubtitle: '利用实验前数据的受控实验',
         whatIsCuped: '什么是 CUPED？',
         cupedExplanation: 'CUPED利用实验前期的行为来减少估计的方差。如果用户在实验前点击多，实验后也点击多，我们可以"控制"这种基线行为，获得更精确的估计。',
@@ -384,6 +404,7 @@ export const translations = {
         step4Title: '计算调整后的结果',
         preVsPostCTR: '实验前 vs 实验后 CTR（每用户）',
         scatterExplain: '每个点代表一个用户。X和Y轴之间的相关性显示了实验前期行为的预测能力。相关性越高 = CUPED的方差缩减越多。',
+        noScatterData: '散点数据将在实验启动并收集到后期数据后显示。',
         varianceReduction: '方差缩减',
         before: '之前（原始）',
         after: '之后（CUPED）',
@@ -395,12 +416,12 @@ export const translations = {
         stdError: '标准误',
 
         // DiD Panel
-        didWalkthrough: '📈 双重差分法',
+        didWalkthrough: '双重差分法',
         didSubtitle: '消除全局时间效应',
         whatIsDid: '什么是 DiD？',
         didExplanation: 'DiD比较每组从实验前到实验后的变化。如果某些因素同等影响两组（如季节性），它们会相互抵消。',
         parallelTrendsWarning: '平行趋势警告！',
-        parallelTrendsCaveat: '⚠️ 假设"平行趋势"：没有处理的情况下，两组会有相似的变化。',
+        parallelTrendsCaveat: '假设"平行趋势"：没有处理的情况下，两组会有相似的变化。',
         didTable: '2×2 DiD 表格',
         prePeriodLabel: '实验前期',
         postPeriodLabel: '实验后期',
@@ -426,7 +447,7 @@ export const translations = {
         didTreatmentEffect: 'DiD 处理效应',
 
         // Compare Panel
-        compareMethods: '⚖️ 方法对比',
+        compareMethods: '方法对比',
         sideByAnalysis: '并列分析',
         trueEffectConfigured: '真实处理效应（配置值）',
         naiveAB: '简单 A/B',
@@ -435,8 +456,8 @@ export const translations = {
         cupedDesc: '利用实验前期的方差缩减',
         did: 'DiD',
         didDesc: '双重差分法',
-        strengths: '✓ 优点',
-        weaknesses: '✗ 缺点',
+        strengths: '优点',
+        weaknesses: '缺点',
         whenToUse: '使用场景:',
 
         // Pros/Cons
@@ -459,7 +480,7 @@ export const translations = {
         whenDid: '当有外部因素随时间影响两组时使用。',
 
         // Sanity Checks
-        sanityChecks: '🔍 合理性检查',
+        sanityChecks: '合理性检查',
         srmCheck: '样本比例不匹配 (SRM)',
         srmOk: '未检测到显著的样本比例不匹配。',
         srmWarning: '警告：样本量与50/50分配显著不同。检查分配是否有bug。',
@@ -470,7 +491,7 @@ export const translations = {
         parallelTrendsExplain: '查看DiD面板的时序图。在启动线之前，两组应该大致平行移动。',
 
         // Key Insights
-        keyInsights: '💡 关键洞察',
+        keyInsights: '关键洞察',
         insightImbalance: '当不平衡较高时：CUPED和DiD会比简单A/B比较给出更准确的估计。',
         insightTrends: '当存在时间趋势时：DiD消除公共趋势。简单A/B会将趋势效应归因于处理。',
         insightPower: '为了最大功效：CUPED通常减少最多的方差，给出更窄的置信区间和更早的显著性。',
@@ -500,7 +521,7 @@ export const translations = {
 
         // Sample Size Calculator
         tabSampleSize: '样本量',
-        sampleSizeCalculator: '🧮 样本量计算器',
+        sampleSizeCalculator: '样本量计算器',
         sampleSizeSubtitle: '实验前规划',
         whatIsSampleSize: '为什么要计算样本量？',
         sampleSizeExplanation: '在运行A/B测试之前，必须确定需要多少用户。用户太少 = 没有统计功效。用户太多 = 浪费时间和资源。',
@@ -509,9 +530,9 @@ export const translations = {
         baselineCTRDesc: '实验前的当前转化率。从分析系统获取（例如：5% = 100个用户中有5个转化）。',
         mdeLabel: '最小可检测效应 (MDE)',
         mdeDesc: '你想检测的最小改进幅度。MDE越小 = 需要更多用户。根据业务影响选择（例如：1%提升 = 需要检测CTR从5%变到5.05%）。',
-        statisticalPower: '统计功效',
+        statisticalPower: '统计功效 (1 - β)',
         powerDesc: '当真实效应存在时检测到它的概率。80%是标准值（意味着5次中有4次能检测到真实效应）。越高 = 越有信心但需要更多用户。',
-        significanceLevel: '显著性水平',
+        significanceLevel: '显著性水平 (α)',
         significanceDesc: '假阳性的概率（实际没有效应却宣布有赢家）。5%是标准值。越低 = 假警报越少但需要更多用户。',
         dailyTraffic: '日均流量',
         dailyTrafficDesc: '每天访问的合格用户平均数量。从分析仪表板获取。',
@@ -541,12 +562,23 @@ export const translations = {
         durationFormula: '时长 = (2 × n) / (日均流量 × 分配比例)',
 
         // Recommendations
-        recommendations: '💡 建议',
+        recommendations: '建议',
         recMinDuration: '至少运行1-2个完整周以捕捉周期性变化',
         recNoPeeking: '避免根据中间结果提前停止（偷看问题）',
         recSeasonality: '考虑节假日和营销活动的影响',
         recFullWeeks: '建议凑整周数以获得更清晰的分析',
         converted: '转化',
+        speed: '速度',
+        jumpWeek: '快进1周',
+        jumpDay: '1天',
+        jumpHour: '1时',
+        jumpLabel: '快进:',
+        month: '月',
+        week: '周',
+        day: '天',
+        hour: '时',
+        minute: '分',
+        second: '秒',
     },
 } as const;
 

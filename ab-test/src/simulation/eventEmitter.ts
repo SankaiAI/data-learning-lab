@@ -1,5 +1,5 @@
 import type { User, SimulationEvent, SimulationConfig, MetricType } from './types';
-import { selectRandomUser, randomLogNormal, randomDuration } from './userGenerator';
+import { selectRandomUser, randomLogNormal, randomDuration, randomNormal, randomBinomial } from './userGenerator';
 
 let eventCounter = 0;
 
@@ -112,4 +112,120 @@ export function generateEventBatch(
 
 export function resetEventCounter(): void {
     eventCounter = 0;
+}
+
+export function fastForwardSimulation(
+    users: User[],
+    config: SimulationConfig,
+    durationSeconds: number,
+    currentElapsed: number
+): void {
+    const endElapsed = currentElapsed + durationSeconds;
+    const totalSystemEvents = config.eventsPerSecond * durationSeconds;
+
+    // Compute total weight once
+    const totalWeight = users.reduce((sum, u) => sum + u.trafficIntensity, 0);
+
+    users.forEach(user => {
+        const expectedEvents = totalSystemEvents * (user.trafficIntensity / totalWeight);
+        // Sample actual events for this period
+        const actualEvents = Math.max(0, Math.round(randomNormal(expectedEvents, Math.sqrt(expectedEvents))));
+
+        if (actualEvents <= 0) return;
+
+        // Split into Pre and Post
+        let preDuration = 0;
+        let postDuration = 0;
+
+        // Determine split based on launchTime overlap
+        if (endElapsed <= config.launchTime) {
+            preDuration = durationSeconds;
+        } else if (currentElapsed >= config.launchTime) {
+            postDuration = durationSeconds;
+        } else {
+            preDuration = config.launchTime - currentElapsed;
+            postDuration = endElapsed - config.launchTime;
+        }
+
+        // Allocate events proportionally
+        const preEvents = Math.round(actualEvents * (preDuration / durationSeconds));
+        const postEvents = actualEvents - preEvents;
+
+        const updateBulkStats = (count: number, period: 'pre' | 'post') => {
+            if (count <= 0) return;
+
+            // Determine effective rate (using midpoint time)
+            const duration = period === 'pre' ? preDuration : postDuration;
+            const startTime = period === 'pre' ? currentElapsed : Math.max(currentElapsed, config.launchTime);
+            const tMid = startTime + duration / 2;
+
+            let rate = user.baselineCTR * (1 + config.timeTrendStrength * tMid / 60);
+
+            if (period === 'post' && user.group === 'treatment') {
+                rate *= (1 + config.treatmentEffect);
+            }
+
+            // Apply metric specific logic
+            if (config.metricType === 'ctr' || config.metricType === 'conversion') {
+                const clicks = randomBinomial(count, rate);
+                if (period === 'pre') {
+                    user.preImpressions += count;
+                    user.preClicks += clicks;
+                    user.preMetricSum += clicks;
+                    user.preMetricCount += count;
+                } else {
+                    user.postImpressions += count;
+                    user.postClicks += clicks;
+                    user.postMetricSum += clicks;
+                    user.postMetricCount += count;
+                }
+            } else if (config.metricType === 'revenue') {
+                // Revenue: 30% conversion rate, then log-normal value
+                // Expected Sum = Conversions * Rate (Base Revenue)
+                const conversions = randomBinomial(count, 0.3);
+
+                if (conversions > 0) {
+                    const cv = 0.5 * config.noiseLevel;
+                    // variance of single purchase ~ (rate * cv)^2
+                    // std of Sum ~ sqrt(conversions) * rate * cv
+                    const totalRev = Math.max(0, randomNormal(conversions * rate, Math.sqrt(conversions) * rate * cv));
+
+                    if (period === 'pre') {
+                        user.preClicks += conversions;
+                        user.preMetricSum += totalRev;
+                    } else {
+                        user.postClicks += conversions;
+                        user.postMetricSum += totalRev;
+                    }
+                }
+                // Impressions/Count always increments
+                if (period === 'pre') {
+                    user.preImpressions += count;
+                    user.preMetricCount += count;
+                } else {
+                    user.postImpressions += count;
+                    user.postMetricCount += count;
+                }
+            } else if (config.metricType === 'duration') {
+                // Duration: always > 0. Mean = rate.
+                const cv = 0.4 * config.noiseLevel;
+                const totalDur = Math.max(0, randomNormal(count * rate, Math.sqrt(count) * rate * cv));
+
+                if (period === 'pre') {
+                    user.preImpressions += count;
+                    user.preClicks += count; // "Active" sessions
+                    user.preMetricSum += totalDur;
+                    user.preMetricCount += count;
+                } else {
+                    user.postImpressions += count;
+                    user.postClicks += count;
+                    user.postMetricSum += totalDur;
+                    user.postMetricCount += count;
+                }
+            }
+        };
+
+        updateBulkStats(preEvents, 'pre');
+        updateBulkStats(postEvents, 'post');
+    });
 }

@@ -7,11 +7,16 @@ interface LiveStreamProps {
     events: SimulationEvent[];
     metrics: AggregatedMetrics;
     metricType: MetricType;
+    elapsedTime: number;
+    launchTime: number;
+    onExportCSV: () => void;
+    onExportJSON: () => void;
 }
 
-export function LiveStream({ events, metrics, metricType }: LiveStreamProps) {
+export function LiveStream({ events, metrics, metricType, elapsedTime, launchTime, onExportCSV, onExportJSON }: LiveStreamProps) {
     const { t, language } = useLanguage();
     const config = METRIC_CONFIGS[metricType];
+    const currentPeriod = elapsedTime >= launchTime ? 'post' : 'pre';
 
     const formatNumber = (n: number) => n.toLocaleString();
 
@@ -38,7 +43,12 @@ export function LiveStream({ events, metrics, metricType }: LiveStreamProps) {
         <div className="live-stream">
             <div className="panel-header">
                 <h2>{t('liveStream')}</h2>
-                <span className="event-count">{events.length} {t('events')}</span>
+                <div className="header-badges">
+                    <span className={`period-indicator ${currentPeriod}`}>
+                        {currentPeriod === 'pre' ? t('prePeriod') : t('postPeriod')}
+                    </span>
+                    <span className="event-count">{events.length} {t('events')}</span>
+                </div>
             </div>
 
             <div className="metrics-grid">
@@ -101,6 +111,16 @@ export function LiveStream({ events, metrics, metricType }: LiveStreamProps) {
                         </div>
                     ))}
                 </div>
+            </div>
+
+            <div className="export-bar">
+                <span className="export-label">Export Data:</span>
+                <button className="btn-export" onClick={onExportCSV}>
+                    {t('exportCSV')}
+                </button>
+                <button className="btn-export" onClick={onExportJSON}>
+                    {t('exportJSON')}
+                </button>
             </div>
         </div>
     );

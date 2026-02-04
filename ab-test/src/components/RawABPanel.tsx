@@ -77,7 +77,7 @@ export function RawABPanel({ result, metrics, imbalanceCheck, metricType }: RawA
 
             {imbalanceCheck.imbalanceDetected && (
                 <div className="warning-banner">
-                    <span className="warning-icon">⚠️</span>
+                    <span className="warning-icon">!</span>
                     <div>
                         <strong>{t('baselineImbalanceDetected')}</strong>
                         <p>{t('baselineImbalanceWarning')}</p>

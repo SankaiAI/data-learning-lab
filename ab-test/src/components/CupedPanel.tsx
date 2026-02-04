@@ -1,4 +1,4 @@
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
 import type { CupedResult, MetricType } from '../simulation/types';
 import { METRIC_CONFIGS } from '../simulation/types';
 import { useLanguage } from '../i18n';
@@ -113,43 +113,67 @@ export function CupedPanel({ result, scatterData, metricType }: CupedPanelProps)
                 </div>
             </div>
 
+
             <div className="scatter-section">
                 <h3>{language === 'zh' ? `前后期 ${metricLabel} 对比` : `Pre vs Post ${metricLabel}`}</h3>
                 <div className="chart-container">
-                    <ResponsiveContainer width="100%" height={320}>
-                        <ScatterChart margin={{ top: 30, right: 20, bottom: 50, left: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                            <XAxis
-                                type="number"
-                                dataKey="x"
-                                name={`Pre-period ${metricLabel}`}
-                                unit={chartUnit}
-                                stroke="rgba(255,255,255,0.5)"
-                                label={{ value: `Pre-period ${metricLabel} (${chartUnit})`, position: 'insideBottom', offset: -10, fill: 'rgba(255,255,255,0.6)' }}
-                            />
-                            <YAxis
-                                type="number"
-                                dataKey="y"
-                                name={`Post-period ${metricLabel}`}
-                                unit={chartUnit}
-                                stroke="rgba(255,255,255,0.5)"
-                                label={{ value: `Post-period ${metricLabel} (${chartUnit})`, angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
-                            />
-                            <Tooltip
-                                contentStyle={{
-                                    background: 'rgba(0,0,0,0.8)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    color: 'white'
-                                }}
-                            />
-                            <Legend verticalAlign="top" height={36} />
-                            <Scatter name={t('control')} data={controlData} fill="#667eea" fillOpacity={0.6} />
-                            <Scatter name={t('treatment')} data={treatmentData} fill="#38ef7d" fillOpacity={0.6} />
-                            <ReferenceLine y={0} stroke="rgba(255,255,255,0.2)" />
-                            <ReferenceLine x={0} stroke="rgba(255,255,255,0.2)" />
-                        </ScatterChart>
-                    </ResponsiveContainer>
+                    {controlData.length === 0 && treatmentData.length === 0 ? (
+                        <div className="empty-chart-message">
+                            <span className="empty-icon">—</span>
+                            <p>{t('noScatterData')}</p>
+                        </div>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={320}>
+                            <ScatterChart margin={{ top: 30, right: 20, bottom: 50, left: 60 }}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                                <XAxis
+                                    type="number"
+                                    dataKey="x"
+                                    name={`Pre-period ${metricLabel}`}
+                                    unit={chartUnit}
+                                    stroke="rgba(255,255,255,0.5)"
+                                    label={{ value: `Pre-period ${metricLabel} (${chartUnit})`, position: 'insideBottom', offset: -10, fill: 'rgba(255,255,255,0.6)' }}
+                                />
+                                <YAxis
+                                    type="number"
+                                    dataKey="y"
+                                    name={`Post-period ${metricLabel}`}
+                                    unit={chartUnit}
+                                    stroke="rgba(255,255,255,0.5)"
+                                    label={{ value: `Post-period ${metricLabel} (${chartUnit})`, angle: -90, position: 'insideLeft', fill: 'rgba(255,255,255,0.6)' }}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        background: 'rgba(0,0,0,0.9)',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        borderRadius: '8px',
+                                        color: 'white'
+                                    }}
+                                    itemStyle={{ color: 'white' }}
+                                    labelStyle={{ color: 'white', fontWeight: 'bold', marginBottom: '4px' }}
+                                    formatter={(value?: number) => value !== undefined ? `${value.toFixed(2)}${chartUnit}` : ''}
+                                />
+                                <Legend verticalAlign="top" height={36} />
+                                <ZAxis type="number" range={[60, 60]} />
+                                <Scatter
+                                    name={t('control')}
+                                    data={controlData}
+                                    fill="#667eea"
+                                    fillOpacity={0.8}
+                                    isAnimationActive={false}
+                                />
+                                <Scatter
+                                    name={t('treatment')}
+                                    data={treatmentData}
+                                    fill="#38ef7d"
+                                    fillOpacity={0.8}
+                                    isAnimationActive={false}
+                                />
+                                <ReferenceLine y={0} stroke="rgba(255,255,255,0.2)" />
+                                <ReferenceLine x={0} stroke="rgba(255,255,255,0.2)" />
+                            </ScatterChart>
+                        </ResponsiveContainer>
+                    )}
                 </div>
                 <p className="chart-explain">{t('scatterExplain')}</p>
             </div>
@@ -176,7 +200,7 @@ export function CupedPanel({ result, scatterData, metricType }: CupedPanelProps)
                         <span className="reduction-explain">{t('inVariance')}</span>
                     </div>
                 </div>
-                <p className="power-note">💡 {t('powerNote')}</p>
+                <p className="power-note">{t('powerNote')}</p>
             </div>
 
             <div className="main-result">

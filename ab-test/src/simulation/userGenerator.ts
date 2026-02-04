@@ -1,11 +1,21 @@
 import type { User, SimulationConfig, MetricType } from './types';
 
-function randomNormal(mean: number = 0, std: number = 1): number {
+export function randomNormal(mean: number = 0, std: number = 1): number {
     let u = 0, v = 0;
     while (u === 0) u = Math.random();
     while (v === 0) v = Math.random();
     const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     return z * std + mean;
+}
+
+// Approximate Binomial(n, p) using Normal distribution for large n
+// For small n, we could simulate, but for fast forward n is usually large.
+export function randomBinomial(n: number, p: number): number {
+    if (n <= 0) return 0;
+    const mu = n * p;
+    const sigma = Math.sqrt(n * p * (1 - p));
+    const val = Math.round(randomNormal(mu, sigma));
+    return Math.max(0, Math.min(n, val));
 }
 
 function randomBeta(alpha: number, beta: number): number {

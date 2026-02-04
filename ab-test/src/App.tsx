@@ -19,11 +19,11 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<TabType>('samplesize');
 
   const tabs = [
-    { id: 'samplesize' as TabType, label: t('tabSampleSize'), icon: '🧮' },
-    { id: 'raw' as TabType, label: t('tabRaw'), icon: '📊' },
-    { id: 'cuped' as TabType, label: t('tabCuped'), icon: '🎯' },
-    { id: 'did' as TabType, label: t('tabDid'), icon: '📈' },
-    { id: 'compare' as TabType, label: t('tabCompare'), icon: '⚖️' },
+    { id: 'samplesize' as TabType, label: t('tabSampleSize') },
+    { id: 'raw' as TabType, label: t('tabRaw') },
+    { id: 'cuped' as TabType, label: t('tabCuped') },
+    { id: 'did' as TabType, label: t('tabDid') },
+    { id: 'compare' as TabType, label: t('tabCompare') },
   ];
 
   return (
@@ -31,7 +31,13 @@ function AppContent() {
       <header className="app-header">
         <div className="header-content">
           <div className="header-top">
-            <h1>{t('appTitle')}</h1>
+            <h1>
+              <svg className="lab-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 3h6v4H9z" />
+                <path d="M10 7v4l-5 8a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V7" />
+              </svg>
+              {t('appTitle')}
+            </h1>
             <LanguageSwitch />
           </div>
           <p className="subtitle">{t('appSubtitle')}</p>
@@ -48,13 +54,16 @@ function AppContent() {
             onStart={simulation.start}
             onPause={simulation.pause}
             onReset={simulation.reset}
-            onExportJSON={simulation.exportJSON}
-            onExportCSV={simulation.exportCSV}
+            onFastForward={simulation.fastForward}
           />
           <LiveStream
             events={simulation.events}
             metrics={simulation.metrics}
             metricType={simulation.config.metricType}
+            elapsedTime={simulation.elapsedTime}
+            launchTime={simulation.config.launchTime}
+            onExportCSV={simulation.exportCSV}
+            onExportJSON={simulation.exportJSON}
           />
         </aside>
 
@@ -66,8 +75,7 @@ function AppContent() {
                 className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
                 onClick={() => setActiveTab(tab.id)}
               >
-                <span className="tab-icon">{tab.icon}</span>
-                <span className="tab-label">{tab.label}</span>
+                {tab.label}
               </button>
             ))}
           </nav>

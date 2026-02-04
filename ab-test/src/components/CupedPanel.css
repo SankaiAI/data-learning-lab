@@ -21,15 +21,15 @@
 }
 
 .step-number {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 600;
+    font-size: 0.85rem;
     flex-shrink: 0;
 }
 
@@ -53,7 +53,7 @@
 }
 
 .step-result strong {
-    color: #a8edea;
+    color: var(--primary);
 }
 
 .step-explain {
@@ -75,8 +75,8 @@
 }
 
 .chart-container {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
     padding: 16px;
 }
 
@@ -85,6 +85,28 @@
     color: rgba(255, 255, 255, 0.5);
     margin-top: 12px;
     margin-bottom: 0;
+}
+
+.empty-chart-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 320px;
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+}
+
+.empty-chart-message .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-chart-message p {
+    margin: 0;
+    font-size: 0.9rem;
+    max-width: 300px;
 }
 
 .variance-section {
@@ -115,13 +137,13 @@
 }
 
 .variance-card.before {
-    background: rgba(245, 87, 108, 0.2);
-    border: 1px solid rgba(245, 87, 108, 0.3);
+    background: var(--danger-muted);
+    border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .variance-card.after {
-    background: rgba(56, 239, 125, 0.2);
-    border: 1px solid rgba(56, 239, 125, 0.3);
+    background: var(--success-muted);
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
 .variance-label {
@@ -147,14 +169,14 @@
     flex-direction: column;
     align-items: center;
     padding: 16px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(56, 239, 125, 0.2) 100%);
-    border-radius: 12px;
+    background: var(--primary-muted);
+    border-radius: 10px;
 }
 
 .reduction-value {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #38ef7d;
+    color: var(--success);
 }
 
 .reduction-explain {
@@ -163,11 +185,11 @@
 }
 
 .power-note {
-    background: rgba(102, 126, 234, 0.1);
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    background: var(--primary-muted);
+    border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 8px;
     padding: 12px 16px;
     margin-top: 16px;
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
 }

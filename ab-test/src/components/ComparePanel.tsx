@@ -74,7 +74,7 @@ export function ComparePanel({ naiveResult, cupedResult, didResult, metrics, tru
     const methods = [
         {
             name: t('naiveAB'),
-            icon: '📊',
+            icon: 'A',
             result: naiveResult,
             description: t('naiveABDesc'),
             pros: [t('easyToUnderstand'), t('noPrePeriodNeeded')],
@@ -83,7 +83,7 @@ export function ComparePanel({ naiveResult, cupedResult, didResult, metrics, tru
         },
         {
             name: t('cuped'),
-            icon: '🎯',
+            icon: 'C',
             result: cupedResult,
             description: t('cupedDesc'),
             pros: [t('reducesVariance'), t('controlsBaseline')],
@@ -92,7 +92,7 @@ export function ComparePanel({ naiveResult, cupedResult, didResult, metrics, tru
         },
         {
             name: t('did'),
-            icon: '📈',
+            icon: 'D',
             result: didResult,
             description: t('didDesc'),
             pros: [t('removesTimeEffects'), t('controlsForTrends')],
@@ -188,7 +188,7 @@ export function ComparePanel({ naiveResult, cupedResult, didResult, metrics, tru
 
                     <div className={`check-card ${preBalanceOk ? 'pass' : 'warn'}`}>
                         <div className="check-header">
-                            <span className="check-icon">{preBalanceOk ? '✓' : '⚠'}</span>
+                            <span className="check-icon">{preBalanceOk ? '✓' : '!'}</span>
                             <span className="check-name">{t('preBalanceCheck')}</span>
                         </div>
                         <div className="check-details">
@@ -203,7 +203,7 @@ export function ComparePanel({ naiveResult, cupedResult, didResult, metrics, tru
 
                     <div className="check-card info">
                         <div className="check-header">
-                            <span className="check-icon">📊</span>
+                            <span className="check-icon">i</span>
                             <span className="check-name">{t('parallelTrendsVisual')}</span>
                         </div>
                         <p className="check-explain">{t('parallelTrendsExplain')}</p>

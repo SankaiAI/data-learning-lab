@@ -107,6 +107,7 @@ export interface SimulationConfig {
   launchTime: number;
   totalUsers: number;
   baselineValue: number; // Dynamic based on metric type
+  speed: number;
 }
 
 export interface GroupMetrics {
@@ -173,4 +174,5 @@ export const DEFAULT_CONFIG: SimulationConfig = {
   launchTime: 15,
   totalUsers: 200,
   baselineValue: 0.05,
+  speed: 1,
 };
