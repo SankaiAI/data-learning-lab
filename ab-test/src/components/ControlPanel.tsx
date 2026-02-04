@@ -15,23 +15,7 @@ interface ControlPanelProps {
     onFastForward: (days: number) => void;
 }
 
-// Helper to format baseline value based on metric type
-function formatBaselineValue(value: number, metricType: MetricType, language: string): string {
-    const config = METRIC_CONFIGS[metricType];
-    const currencySymbol = language === 'zh' ? '¥' : '$';
-    const timeUnit = language === 'zh' ? '秒' : 's';
 
-    switch (config.unit) {
-        case 'percent':
-            return `${(value * 100).toFixed(1)}%`;
-        case 'currency':
-            return `${currencySymbol}${value.toFixed(2)}`;
-        case 'time':
-            return `${value.toFixed(0)}${timeUnit}`;
-        default:
-            return value.toFixed(2);
-    }
-}
 
 // Helper to format duration
 function formatDuration(seconds: number, t: any): string {
@@ -74,7 +58,7 @@ export function ControlPanel({
     const { t, language } = useLanguage();
     const helpTitle = language === 'zh' ? t('helpTitleZh') : t('helpTitle');
     const isPrePeriod = elapsedTime < config.launchTime;
-    const metricConfig = METRIC_CONFIGS[config.metricType];
+
 
     const handleMetricChange = (newMetricType: MetricType) => {
         const newMetricConfig = METRIC_CONFIGS[newMetricType];
@@ -160,21 +144,6 @@ export function ControlPanel({
                     </select>
                 </div>
                 <p className="hint">{t('metricSelectorDesc')}</p>
-
-                <div className="slider-group">
-                    <label>
-                        {t('baselineValue')}: <strong>{formatBaselineValue(config.baselineValue, config.metricType, language)}</strong>
-                    </label>
-                    <input
-                        type="range"
-                        min={metricConfig.minValue}
-                        max={metricConfig.maxValue}
-                        step={metricConfig.step}
-                        value={config.baselineValue}
-                        onChange={(e) => onUpdateConfig({ baselineValue: parseFloat(e.target.value) })}
-                        disabled={isRunning}
-                    />
-                </div>
             </div>
 
             <div className="control-section">
