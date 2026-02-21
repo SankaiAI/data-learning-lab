@@ -8,6 +8,7 @@ A collection of hands-on data science and ML engineering projects focused on pra
 |---------|-------------|------------|
 | [**CICD-MLflow**](./CICD-MLflow) | Enterprise CI/CD simulation for ML pipelines with real MLflow tracking | Docker, FastAPI, Next.js, MLflow, PostgreSQL, MinIO |
 | [**ab-test**](./ab-test) | Interactive A/B testing learning lab with CUPED and DiD methods | React, TypeScript, Vite, Recharts |
+| [**ab-test-simulation**](./ab-test-simulation) | Animated stakeholder group chat simulating a full end-to-end A/B test process | Vanilla HTML/CSS/JS, Vite |
 
 ---
 
@@ -80,6 +81,38 @@ npm run dev
 
 ---
 
+## 💬 ab-test-simulation
+
+An animated group chat simulation that walks through a complete, real-world A/B test — from idea to ship decision — as a conversation between 6 company stakeholders (PM, Data Scientist, Engineer, Designer, Growth Lead, Legal).
+
+### Key Features
+- Animated Slack-style group chat playing out all 4 phases of an A/B test
+- Live deliverables panel tracking every document shared during the process
+- Replay, pause, and speed controls (1×/2×/5×)
+- Plain-English 8-step daily workflow guide modal
+
+### Quick Start
+
+```bash
+cd ab-test-simulation
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Open http://localhost:5173
+```
+
+### Prerequisites
+- Node.js (v18+ recommended)
+- npm or yarn
+
+📖 [Full Documentation →](./ab-test-simulation/README.md)
+
+---
+
 ## 🚀 Getting Started
 
 ### Clone the Repository
@@ -99,8 +132,9 @@ Navigate to the project directory you want to explore and follow the Quick Start
 
 If you're new to these topics, here's a suggested learning order:
 
-1. **Start with [ab-test](./ab-test)** - Learn fundamental A/B testing concepts, statistical methods (CUPED, DiD), and experimental design
-2. **Continue with [CICD-MLflow](./CICD-MLflow)** - Understand enterprise ML pipelines, experiment tracking, and model deployment workflows
+1. **Start with [ab-test-simulation](./ab-test-simulation)** - Watch how a real team collaborates to design, launch, and analyze an A/B test
+2. **Deep dive with [ab-test](./ab-test)** - Learn the statistical methods hands-on: CUPED, DiD, and real-time streaming simulation
+3. **Continue with [CICD-MLflow](./CICD-MLflow)** - Understand enterprise ML pipelines, experiment tracking, and model deployment workflows
 
 ---
 
