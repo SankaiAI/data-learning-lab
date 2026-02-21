@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A/B Test Simulation — Stakeholder Group Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="workspace-logo">
+          <span class="logo-icon">🧪</span>
+          <span class="logo-text">AB Lab</span>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">EXPERIMENT</div>
+        <div class="channel active" data-phase="all">
+          <span class="channel-icon">#</span> Full Process
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">PHASES</div>
+        <div class="channel" data-phase="phase1">
+          <span class="channel-icon">#</span> 1 · Idea &amp; Hypothesis
+        </div>
+        <div class="channel" data-phase="phase2">
+          <span class="channel-icon">#</span> 2 · Test Design
+        </div>
+        <div class="channel" data-phase="phase3">
+          <span class="channel-icon">#</span> 3 · Launch &amp; Monitor
+        </div>
+        <div class="channel" data-phase="phase4">
+          <span class="channel-icon">#</span> 4 · Analysis &amp; Decision
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">PARTICIPANTS</div>
+        <div class="member-list" id="memberList"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-label">QUICK GUIDE</div>
+        <div class="guide-btn" id="guideBtn">📖 Daily Workflow Guide</div>
+      </div>
+    </aside>
+
+    <!-- Main Chat Area -->
+    <main class="chat-area">
+      <div class="chat-header">
+        <div class="chat-title-group">
+          <span class="chat-hash">#</span>
+          <span class="chat-title" id="chatTitle">Full A/B Test Process Simulation</span>
+        </div>
+        <div class="chat-subtitle" id="chatSubtitle">A real-world simulation of how teams collaborate to run an A/B test</div>
+      </div>
+
+      <div class="messages-container" id="messagesContainer"></div>
+
+      <div class="chat-input-bar">
+        <div class="playback-controls">
+          <button class="ctrl-btn" id="btnReplay" title="Replay from start">⟳ Replay</button>
+          <button class="ctrl-btn" id="btnPause" title="Pause/Resume">⏸ Pause</button>
+          <button class="ctrl-btn" id="btnSpeed" title="Toggle speed">⚡ Speed: 1×</button>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">Getting started...</div>
+      </div>
+    </main>
+
+    <!-- Right Panel -->
+    <aside class="right-panel" id="rightPanel">
+      <div class="panel-header">📋 Deliverables</div>
+      <div class="deliverables-list" id="deliverablesList">
+        <div class="empty-state">Deliverables will appear here as the conversation progresses.</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Guide Modal -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>📖 Daily A/B Test Workflow — Plain English</h2>
+        <button class="modal-close" id="modalClose">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
