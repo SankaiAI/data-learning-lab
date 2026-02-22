@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div class="app-layout">
     <!-- Sidebar -->
@@ -60,7 +62,8 @@
           <span class="chat-hash">#</span>
           <span class="chat-title" id="chatTitle">Full A/B Test Process Simulation</span>
         </div>
-        <div class="chat-subtitle" id="chatSubtitle">A real-world simulation of how teams collaborate to run an A/B test</div>
+        <div class="chat-subtitle" id="chatSubtitle">A real-world simulation of how teams collaborate to run an A/B test
+        </div>
       </div>
 
       <div class="messages-container" id="messagesContainer"></div>
@@ -70,11 +73,24 @@
           <button class="ctrl-btn" id="btnReplay" title="Replay from start">⟳ Replay</button>
           <button class="ctrl-btn" id="btnPause" title="Pause/Resume">⏸ Pause</button>
           <button class="ctrl-btn" id="btnSpeed" title="Toggle speed">⚡ Speed: 1×</button>
+          <button class="ctrl-btn" id="btnJumpEnd" title="Jump to end">⏭ Jump to End</button>
         </div>
         <div class="progress-bar-wrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
         <div class="progress-label" id="progressLabel">Getting started...</div>
+
+        <div class="qa-divider"></div>
+
+        <div class="qa-row">
+          <div class="qa-input-wrap" id="qaInputWrap">
+            <span class="qa-icon">✨</span>
+            <textarea id="qaInput" class="qa-input" placeholder="Ask a question — the right team member will answer..."
+              rows="1"></textarea>
+            <button class="qa-send-btn" id="qaSendBtn" title="Send">↑</button>
+          </div>
+          <div class="qa-status" id="qaStatus"></div>
+        </div>
       </div>
     </main>
 
@@ -99,6 +115,7 @@
   </div>
 
   <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
+
 </html>
