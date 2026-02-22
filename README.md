@@ -88,8 +88,9 @@ An animated group chat simulation that walks through a complete, real-world A/B 
 ### Key Features
 - Animated Slack-style group chat playing out all 4 phases of an A/B test
 - Live deliverables panel tracking every document shared during the process
-- Replay, pause, and speed controls (1×/2×/5×)
+- Replay, pause, speed controls (1×/2×/5×), and jump-to-end
 - Plain-English 8-step daily workflow guide modal
+- **🤖 AI Chatbot** — ask any question and the right stakeholder answers in character (powered by Gemini)
 
 ### Quick Start
 
@@ -108,6 +109,7 @@ npm run dev
 ### Prerequisites
 - Node.js (v18+ recommended)
 - npm or yarn
+- A free [Gemini API key](https://aistudio.google.com/app/apikey) — add it to `ab-test-simulation/.env` as `VITE_GEMINI_API_KEY=your_key`
 
 📖 [Full Documentation →](./ab-test-simulation/README.md)
 

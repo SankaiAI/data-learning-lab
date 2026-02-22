@@ -40,6 +40,13 @@ Phase 4 — Analysis & Decision   →  Z-test results, revenue impact, ship deci
 
 ## Getting Started
 
+**1. Add your Gemini API key** — create a `.env` file in the project root:
+```
+VITE_GEMINI_API_KEY=your_key_here
+```
+Get a free key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
+
+**2. Install and run:**
 ```bash
 npm install
 npm run dev
@@ -54,10 +61,12 @@ Then open [http://localhost:5173](http://localhost:5173) in your browser.
 | 🎬 Animated chat | Messages appear with typing indicators, one by one |
 | 📋 Deliverables panel | Tracks every document/report shared during the process |
 | ⟳ Replay | Restart the simulation from the beginning |
+| ⏭ Jump to End | Skip instantly to the final state of the simulation |
 | ⏸ Pause / Resume | Pause the animation at any point |
 | ⚡ Speed control | Toggle 1×, 2×, or 5× playback speed |
 | 📖 Workflow Guide | Plain-English 8-step daily A/B test process reference |
 | 🔗 Phase navigation | Jump directly to any phase via the sidebar |
+| 🤖 AI Chatbot | Ask any A/B testing question — the right stakeholder answers in character |
 
 ## Project Structure
 
@@ -67,6 +76,8 @@ ab-test-simulation/
 ├── style.css     # Dark mode UI, animations
 ├── data.js       # All stakeholder conversations & workflow guide
 ├── app.js        # Chat animation engine and interaction logic
+├── llm.js        # Gemini API integration & stakeholder routing
+├── .env          # Your Gemini API key (never committed)
 └── package.json  # Vite dev server
 ```
 
@@ -78,3 +89,4 @@ After watching the full simulation, you'll understand:
 2. **What documents get produced** at each phase
 3. **Why statistical rigour matters** — especially around peeking and sample sizes
 4. **How decisions get made** — combining statistical results with business impact
+5. **Ask follow-up questions** — use the chatbot to go deeper on any concept with the relevant stakeholder
