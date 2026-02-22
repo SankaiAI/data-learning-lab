@@ -7,8 +7,8 @@ A collection of hands-on data science and ML engineering projects focused on pra
 | Project | Description | Tech Stack |
 |---------|-------------|------------|
 | [**CICD-MLflow**](./CICD-MLflow) | Enterprise CI/CD simulation for ML pipelines with real MLflow tracking | Docker, FastAPI, Next.js, MLflow, PostgreSQL, MinIO |
-| [**ab-test**](./ab-test) | Interactive A/B testing learning lab with CUPED and DiD methods | React, TypeScript, Vite, Recharts |
-| [**ab-test-simulation**](./ab-test-simulation) | Animated stakeholder group chat simulating a full end-to-end A/B test process | Vanilla HTML/CSS/JS, Vite |
+| [**ab-test-cuped-did-lab**](./ab-test-cuped-did-lab) | Interactive A/B testing learning lab with CUPED and DiD methods | React, TypeScript, Vite, Recharts |
+| [**ab-test-stakeholder-chat**](./ab-test-stakeholder-chat) | Animated stakeholder group chat simulating a full end-to-end A/B test process | Vanilla HTML/CSS/JS, Vite |
 
 ---
 
@@ -49,7 +49,7 @@ docker compose up --build
 
 ---
 
-## 📊 ab-test
+## 📊 ab-test-cuped-did-lab
 
 An interactive web application that teaches A/B testing concepts through real-time simulated streaming events. Learn how **CUPED** reduces variance and **Difference-in-Differences (DiD)** removes confounding time effects.
 
@@ -62,7 +62,7 @@ An interactive web application that teaches A/B testing concepts through real-ti
 ### Quick Start
 
 ```bash
-cd ab-test
+cd ab-test-cuped-did-lab
 
 # Install dependencies
 npm install
@@ -77,11 +77,11 @@ npm run dev
 - Node.js (v18+ recommended)
 - npm or yarn
 
-📖 [Full Documentation →](./ab-test/README.md)
+📖 [Full Documentation →](./ab-test-cuped-did-lab/README.md)
 
 ---
 
-## 💬 ab-test-simulation
+## 💬 ab-test-stakeholder-chat
 
 An animated group chat simulation that walks through a complete, real-world A/B test — from idea to ship decision — as a conversation between 6 company stakeholders (PM, Data Scientist, Engineer, Designer, Growth Lead, Legal).
 
@@ -95,7 +95,7 @@ An animated group chat simulation that walks through a complete, real-world A/B 
 ### Quick Start
 
 ```bash
-cd ab-test-simulation
+cd ab-test-stakeholder-chat
 
 # Install dependencies
 npm install
@@ -109,9 +109,9 @@ npm run dev
 ### Prerequisites
 - Node.js (v18+ recommended)
 - npm or yarn
-- A free [Gemini API key](https://aistudio.google.com/app/apikey) — add it to `ab-test-simulation/.env` as `VITE_GEMINI_API_KEY=your_key`
+- A free [Gemini API key](https://aistudio.google.com/app/apikey) — add it to `ab-test-stakeholder-chat/.env` as `VITE_GEMINI_API_KEY=your_key`
 
-📖 [Full Documentation →](./ab-test-simulation/README.md)
+📖 [Full Documentation →](./ab-test-stakeholder-chat/README.md)
 
 ---
 
@@ -134,8 +134,8 @@ Navigate to the project directory you want to explore and follow the Quick Start
 
 If you're new to these topics, here's a suggested learning order:
 
-1. **Start with [ab-test-simulation](./ab-test-simulation)** - Watch how a real team collaborates to design, launch, and analyze an A/B test
-2. **Deep dive with [ab-test](./ab-test)** - Learn the statistical methods hands-on: CUPED, DiD, and real-time streaming simulation
+1. **Start with [ab-test-stakeholder-chat](./ab-test-stakeholder-chat)** - Watch how a real team collaborates to design, launch, and analyze an A/B test
+2. **Deep dive with [ab-test-cuped-did-lab](./ab-test-cuped-did-lab)** - Learn the statistical methods hands-on: CUPED, DiD, and real-time streaming simulation
 3. **Continue with [CICD-MLflow](./CICD-MLflow)** - Understand enterprise ML pipelines, experiment tracking, and model deployment workflows
 
 ---
